@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CJT Field App</title>
+
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#111111">
+
+<style>
+body {
+  margin:0;
+  font-family: Arial, sans-serif;
+  background:#f4f4f4;
+}
+header {
+  background:#111;
+  color:white;
+  padding:18px;
+  font-size:20px;
+  font-weight:700;
+}
+.wrap {
+  padding:16px;
+  display:grid;
+  gap:14px;
+}
+a.btn {
+  display:block;
+  background:white;
+  padding:18px;
+  border-radius:14px;
+  text-decoration:none;
+  color:#111;
+  font-weight:700;
+  box-shadow:0 2px 6px rgba(0,0,0,.08);
+}
+a.btn:hover {
+  background:#eaeaea;
+}
+</style>
+</head>
+
+<body>
+<header>CJT Field App</header>
+
+<div class="wrap">
+
+<a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLScvZA6r7Nlp5y3KfMqB2SHBV5hKeRXVFVGz7s_RGkc0ioSWZg/viewform" target="_blank">CJT Tank Levels</a>
+
+<a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSdjyN2IfoZTlYmSfGk9GrTbvs-uX7JyBUjGpZTHQg7o4kjGMQ/viewform" target="_blank">Driver Pre Trip Inspection</a>
+
+<a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSe-bXzKUNqqX6doGBI2lDKWOBpI4zVyLcT2RWzi4ECenynpiQ/viewform" target="_blank">Driver Loader Tracker</a>
+
+<a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSeRBl8u1W-MkQWCsHBejOWgxugN30eF7VE1_VH4ASVaUgb0ng/viewform" target="_blank">Offload Log</a>
+
+<a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLScz3_nfZaCuZjce2TwjcqwgdXTabMn205amwdUyor3GXwuvqA/viewform" target="_blank">Oil Sales Report</a>
+
+<a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSfqmb4-FSJQlIILMDa2IqIhYwao8T1AtzqpHHoZVi4mZMDlGA/viewform" target="_blank">Centrifuge Health Log</a>
+
+<a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSfI_mcJyZ9qFtrJnaLN6tj3lT8KFqBgQ2Dn65C43DLyUPsi5Q/viewform" target="_blank">Decanter Flush Log</a>
+
+</div>
+
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js");
+}
+</script>
+
+</body>
+</html>
