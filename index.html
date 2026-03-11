@@ -19,7 +19,7 @@
   --green:#22c55e;
   --yellow:#eab308;
   --red:#ef4444;
-  --accent:#2563eb;
+  --blue:#60a5fa;
 }
 
 *{
@@ -56,7 +56,7 @@ header {
   padding: 16px;
   display: grid;
   gap: 14px;
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
@@ -105,7 +105,19 @@ header {
   color: #e2e8f0;
 }
 
-.capacity-grid {
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.grid-4 {
   display: grid;
   grid-template-columns: 1fr;
   gap: 12px;
@@ -143,6 +155,12 @@ header {
   margin-bottom: 8px;
 }
 
+.kpi {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.05;
+}
+
 .sub {
   margin-top: 8px;
   font-size: 13px;
@@ -152,6 +170,7 @@ header {
 .green { color: var(--green); }
 .yellow { color: var(--yellow); }
 .red { color: var(--red); }
+.blue { color: var(--blue); }
 .loading { opacity: 0.65; }
 
 a.btn {
@@ -192,9 +211,38 @@ a.btn:active{
   padding: 6px 0 12px;
 }
 
+.status-on {
+  color: var(--green);
+  font-weight: 900;
+}
+
+.status-off {
+  color: var(--red);
+  font-weight: 900;
+}
+
+.status-other {
+  color: var(--yellow);
+  font-weight: 900;
+}
+
 @media (min-width: 700px) {
-  .capacity-grid {
+  .grid-2 {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .grid-3 {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .grid-4 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1000px) {
+  .grid-4 {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
   }
 }
 </style>
@@ -211,8 +259,7 @@ a.btn:active{
   </div>
 
   <div class="section-title">Live Capacity</div>
-
-  <div class="capacity-grid">
+  <div class="grid-2">
     <div class="card">
       <h2>Midland Open Space</h2>
       <div id="midlandOpen" class="big-number loading">Loading...</div>
@@ -226,22 +273,79 @@ a.btn:active{
     </div>
   </div>
 
+  <div class="section-title">Oil On Yard</div>
+  <div class="grid-3">
+    <div class="card">
+      <h2>Midland Oil On Yard</h2>
+      <div id="midlandOil" class="big-number loading">Loading...</div>
+      <div class="sub">Rolling total since start date</div>
+    </div>
+
+    <div class="card">
+      <h2>Odessa Oil On Yard</h2>
+      <div id="odessaOil" class="big-number loading">Loading...</div>
+      <div class="sub">Rolling total since start date</div>
+    </div>
+
+    <div class="card">
+      <h2>Combined Oil On Yard</h2>
+      <div id="combinedOil" class="big-number loading">Loading...</div>
+      <div class="sub">Both facilities combined</div>
+    </div>
+  </div>
+
+  <div class="section-title">24 Hour Operations</div>
+  <div class="grid-4">
+    <div class="card">
+      <h2>Midland Processing Hours</h2>
+      <div id="midlandProc" class="kpi loading">Loading...</div>
+    </div>
+
+    <div class="card">
+      <h2>Odessa Processing Hours</h2>
+      <div id="odessaProc" class="kpi loading">Loading...</div>
+    </div>
+
+    <div class="card">
+      <h2>Midland Downtime Hours</h2>
+      <div id="midlandDown" class="kpi loading">Loading...</div>
+    </div>
+
+    <div class="card">
+      <h2>Odessa Downtime Hours</h2>
+      <div id="odessaDown" class="kpi loading">Loading...</div>
+    </div>
+
+    <div class="card">
+      <h2>Midland Status</h2>
+      <div id="midlandStatus" class="kpi loading">Loading...</div>
+    </div>
+
+    <div class="card">
+      <h2>Odessa Status</h2>
+      <div id="odessaStatus" class="kpi loading">Loading...</div>
+    </div>
+
+    <div class="card">
+      <h2>Midland Last Operator</h2>
+      <div id="midlandOperator" class="kpi loading">Loading...</div>
+    </div>
+
+    <div class="card">
+      <h2>Odessa Last Operator</h2>
+      <div id="odessaOperator" class="kpi loading">Loading...</div>
+    </div>
+  </div>
+
   <div id="lastUpdated" class="muted">Waiting on live data...</div>
 
   <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLScvZA6r7Nlp5y3KfMqB2SHBV5hKeRXVFVGz7s_RGkc0ioSWZg/viewform" target="_blank">CJT Tank Levels</a>
-
   <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSdjyN2IfoZTlYmSfGk9GrTbvs-uX7JyBUjGpZTHQg7o4kjGMQ/viewform" target="_blank">Driver Pre Trip Inspection</a>
-
   <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSe-bXzKUNqqX6doGBI2lDKWOBpI4zVyLcT2RWzi4ECenynpiQ/viewform" target="_blank">Driver Loader Tracker</a>
-
   <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSeRBl8u1W-MkQWCsHBejOWgxugN30eF7VE1_VH4ASVaUgb0ng/viewform" target="_blank">Offload Log</a>
-
   <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLScz3_nfZaCuZjce2TwjcqwgdXTabMn205amwdUyor3GXwuvqA/viewform" target="_blank">Oil Sales Report</a>
-
   <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSfqmb4-FSJQlIILMDa2IqIhYwao8T1AtzqpHHoZVi4mZMDlGA/viewform" target="_blank">Centrifuge Health Log</a>
-
   <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSfI_mcJyZ9qFtrJnaLN6tj3lT8KFqBgQ2Dn65C43DLyUPsi5Q/viewform" target="_blank">Decanter Flush Log</a>
-
   <a class="btn" href="https://docs.google.com/spreadsheets/d/18F9w2pAFuSukRMoEHIF0bj6gyc8yPEKJh0udq2u0_yM/edit?gid=0#gid=0" target="_blank">Capacity Dashboard</a>
 
   <div class="footer-note">CJT Live Operations Dashboard</div>
@@ -380,6 +484,10 @@ function fmtBbl(value) {
   return `${Math.round(cleanNumber(value)).toLocaleString()} bbl`;
 }
 
+function fmtHours(value) {
+  return `${cleanNumber(value).toFixed(1)} hrs`;
+}
+
 function setCapacityColor(el, value) {
   el.classList.remove("green", "yellow", "red", "loading");
   const v = cleanNumber(value);
@@ -393,8 +501,28 @@ function setCapacityColor(el, value) {
   }
 }
 
-function getCellValue(cell) {
-  return cell && typeof cell.v !== "undefined" ? cell.v : 0;
+function setStatusColor(el, value) {
+  el.classList.remove("status-on", "status-off", "status-other", "loading");
+  const v = String(value || "").trim().toUpperCase();
+
+  if (v === "ON" || v === "ACTIVE") {
+    el.classList.add("status-on");
+  } else if (v === "OFF" || v === "SHUTDOWN" || v === "CONSTRUCTION") {
+    el.classList.add("status-off");
+  } else {
+    el.classList.add("status-other");
+  }
+}
+
+function setOilColor(el) {
+  el.classList.remove("green", "yellow", "red", "loading");
+  el.classList.add("blue");
+}
+
+function getValueAt(rows, rowIndex, colIndex) {
+  const row = rows[rowIndex];
+  if (!row || !row.c || !row.c[colIndex] || typeof row.c[colIndex].v === "undefined") return "";
+  return row.c[colIndex].v;
 }
 
 fetch(url)
@@ -403,36 +531,90 @@ fetch(url)
     const json = JSON.parse(text.substring(47).slice(0, -2));
     const rows = json.table.rows;
 
-    let midlandOpen = 0;
-    let odessaOpen = 0;
+    // Main capacity block
+    const midlandOpen = cleanNumber(getValueAt(rows, 6, 1)); // B7
+    const odessaOpen = cleanNumber(getValueAt(rows, 6, 2));  // C7
 
-    rows.forEach(row => {
-      const label = row.c && row.c[0] ? String(row.c[0].v).trim() : "";
-      const midlandVal = getCellValue(row.c[1]);
-      const odessaVal = getCellValue(row.c[2]);
+    // Oil block assumed layout:
+    // K3/L3 starting oil
+    // K4/L4 oil in
+    // K5/L5 oil sold
+    // K6/L6 net oil on yard
+    // K8 combined oil on yard
+    const midlandOil = cleanNumber(getValueAt(rows, 5, 10));   // K6
+    const odessaOil = cleanNumber(getValueAt(rows, 5, 11));    // L6
+    const combinedOil = cleanNumber(getValueAt(rows, 7, 10));  // K8
 
-      if (label === "Available Capacity") {
-        midlandOpen = cleanNumber(midlandVal);
-        odessaOpen = cleanNumber(odessaVal);
-      }
-    });
+    // Operations block assumed layout:
+    // O3/P3 processing
+    // O4/P4 downtime
+    // O5/P5 current status
+    // O6/P6 last operator
+    const midlandProc = cleanNumber(getValueAt(rows, 2, 14));     // O3
+    const odessaProc = cleanNumber(getValueAt(rows, 2, 15));      // P3
+    const midlandDown = cleanNumber(getValueAt(rows, 3, 14));     // O4
+    const odessaDown = cleanNumber(getValueAt(rows, 3, 15));      // P4
+    const midlandStatus = String(getValueAt(rows, 4, 14) || "Unknown");  // O5
+    const odessaStatus = String(getValueAt(rows, 4, 15) || "Unknown");   // P5
+    const midlandOperator = String(getValueAt(rows, 5, 14) || "Unknown"); // O6
+    const odessaOperator = String(getValueAt(rows, 5, 15) || "Unknown");  // P6
 
     const midlandOpenEl = document.getElementById("midlandOpen");
     const odessaOpenEl = document.getElementById("odessaOpen");
+    const midlandOilEl = document.getElementById("midlandOil");
+    const odessaOilEl = document.getElementById("odessaOil");
+    const combinedOilEl = document.getElementById("combinedOil");
+    const midlandProcEl = document.getElementById("midlandProc");
+    const odessaProcEl = document.getElementById("odessaProc");
+    const midlandDownEl = document.getElementById("midlandDown");
+    const odessaDownEl = document.getElementById("odessaDown");
+    const midlandStatusEl = document.getElementById("midlandStatus");
+    const odessaStatusEl = document.getElementById("odessaStatus");
+    const midlandOperatorEl = document.getElementById("midlandOperator");
+    const odessaOperatorEl = document.getElementById("odessaOperator");
 
     midlandOpenEl.textContent = fmtBbl(midlandOpen);
     odessaOpenEl.textContent = fmtBbl(odessaOpen);
+    midlandOilEl.textContent = fmtBbl(midlandOil);
+    odessaOilEl.textContent = fmtBbl(odessaOil);
+    combinedOilEl.textContent = fmtBbl(combinedOil);
+    midlandProcEl.textContent = fmtHours(midlandProc);
+    odessaProcEl.textContent = fmtHours(odessaProc);
+    midlandDownEl.textContent = fmtHours(midlandDown);
+    odessaDownEl.textContent = fmtHours(odessaDown);
+    midlandStatusEl.textContent = midlandStatus;
+    odessaStatusEl.textContent = odessaStatus;
+    midlandOperatorEl.textContent = midlandOperator;
+    odessaOperatorEl.textContent = odessaOperator;
 
     setCapacityColor(midlandOpenEl, midlandOpen);
     setCapacityColor(odessaOpenEl, odessaOpen);
+    setOilColor(midlandOilEl);
+    setOilColor(odessaOilEl);
+    setOilColor(combinedOilEl);
+    setStatusColor(midlandStatusEl, midlandStatus);
+    setStatusColor(odessaStatusEl, odessaStatus);
+
+    [
+      midlandOilEl, odessaOilEl, combinedOilEl,
+      midlandProcEl, odessaProcEl,
+      midlandDownEl, odessaDownEl,
+      midlandOperatorEl, odessaOperatorEl
+    ].forEach(el => el.classList.remove("loading"));
 
     document.getElementById("lastUpdated").textContent =
       `Last updated: ${new Date().toLocaleString()}`;
   })
   .catch(err => {
     console.error("Dashboard load error:", err);
-    document.getElementById("midlandOpen").textContent = "Error";
-    document.getElementById("odessaOpen").textContent = "Error";
+    [
+      "midlandOpen","odessaOpen","midlandOil","odessaOil","combinedOil",
+      "midlandProc","odessaProc","midlandDown","odessaDown",
+      "midlandStatus","odessaStatus","midlandOperator","odessaOperator"
+    ].forEach(id => {
+      document.getElementById(id).textContent = "Error";
+    });
+
     document.getElementById("lastUpdated").textContent =
       "Could not load live sheet data. Make sure the Capacity Dashboard sheet is shared as Anyone with the link → Viewer.";
   });
