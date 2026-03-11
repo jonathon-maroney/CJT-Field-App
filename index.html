@@ -1,654 +1,508 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>CJT Field App</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CJT Field App</title>
 
-<link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#0f172a">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0f172a">
 
-<style>
-:root{
-  --bg1:#0b1220;
-  --bg2:#111827;
-  --card:rgba(255,255,255,.08);
-  --card-border:rgba(255,255,255,.10);
-  --text:#f8fafc;
-  --muted:#cbd5e1;
-  --green:#22c55e;
-  --yellow:#eab308;
-  --red:#ef4444;
-  --blue:#60a5fa;
-}
+  <style>
+    :root{
+      --bg1:#0b1220;
+      --bg2:#111827;
+      --card:rgba(255,255,255,.08);
+      --card-border:rgba(255,255,255,.10);
+      --text:#f8fafc;
+      --muted:#cbd5e1;
+      --green:#22c55e;
+      --yellow:#eab308;
+      --red:#ef4444;
+      --blue:#60a5fa;
+    }
 
-*{
-  box-sizing:border-box;
-}
+    * { box-sizing:border-box; }
 
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  color: var(--text);
-  background:
-    radial-gradient(circle at top left, rgba(37,99,235,.16), transparent 35%),
-    radial-gradient(circle at top right, rgba(34,197,94,.12), transparent 30%),
-    linear-gradient(160deg, var(--bg1), var(--bg2));
-  min-height: 100vh;
-}
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(37,99,235,.16), transparent 35%),
+        radial-gradient(circle at top right, rgba(34,197,94,.12), transparent 30%),
+        linear-gradient(160deg, var(--bg1), var(--bg2));
+      min-height: 100vh;
+    }
 
-header {
-  background: rgba(0,0,0,.28);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255,255,255,.08);
-  color: white;
-  padding: 18px 16px;
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: .3px;
-  text-align: center;
-  position: sticky;
-  top: 0;
-  z-index: 20;
-}
+    header {
+      background: rgba(0,0,0,.28);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      color: white;
+      padding: 18px 16px;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: .3px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
 
-.wrap {
-  padding: 16px;
-  display: grid;
-  gap: 14px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
+    .wrap {
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
 
-.verse-box{
-  background: rgba(255,255,255,.07);
-  border: 1px solid rgba(255,255,255,.10);
-  border-radius: 18px;
-  padding: 16px;
-  text-align: center;
-  box-shadow: 0 8px 24px rgba(0,0,0,.20);
-  backdrop-filter: blur(8px);
-}
+    .verse-box{
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 18px;
+      padding: 16px;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(0,0,0,.20);
+      backdrop-filter: blur(8px);
+    }
 
-.verse-label{
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #93c5fd;
-  margin-bottom: 8px;
-  font-weight: 700;
-}
+    .verse-label{
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #93c5fd;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
 
-.verse-text{
-  font-size: 15px;
-  line-height: 1.5;
-  color: var(--text);
-  opacity: 0;
-  animation: fadeVerse 1.2s ease forwards;
-}
+    .verse-text{
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--text);
+      opacity: 0;
+      animation: fadeVerse 1.2s ease forwards;
+    }
 
-@keyframes fadeVerse{
-  from{
-    opacity:0;
-    transform: translateY(10px);
-  }
-  to{
-    opacity:1;
-    transform: translateY(0);
-  }
-}
+    @keyframes fadeVerse{
+      from{ opacity:0; transform: translateY(10px); }
+      to{ opacity:1; transform: translateY(0); }
+    }
 
-.section-title {
-  font-size: 18px;
-  font-weight: 800;
-  margin: 6px 0 2px;
-  color: #e2e8f0;
-}
+    .section-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin: 6px 0 2px;
+      color: #e2e8f0;
+    }
 
-.grid-2 {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
+    .grid-2, .grid-3, .grid-4 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
 
-.grid-3 {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
+    .card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      padding: 20px;
+      border-radius: 18px;
+      box-shadow: 0 10px 28px rgba(0,0,0,.22);
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
 
-.grid-4 {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: linear-gradient(135deg, rgba(255,255,255,.08), transparent 40%);
+      pointer-events:none;
+    }
 
-.card {
-  background: var(--card);
-  border: 1px solid var(--card-border);
-  padding: 20px;
-  border-radius: 18px;
-  box-shadow: 0 10px 28px rgba(0,0,0,.22);
-  backdrop-filter: blur(10px);
-  position: relative;
-  overflow: hidden;
-}
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      color: var(--muted);
+    }
 
-.card::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background: linear-gradient(135deg, rgba(255,255,255,.08), transparent 40%);
-  pointer-events:none;
-}
+    .big-number {
+      font-size: 38px;
+      font-weight: 900;
+      line-height: 1.05;
+      margin-bottom: 8px;
+    }
 
-.card h2 {
-  margin: 0 0 10px;
-  font-size: 16px;
-  color: var(--muted);
-}
+    .kpi {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.05;
+    }
 
-.big-number {
-  font-size: 38px;
-  font-weight: 900;
-  line-height: 1.05;
-  margin-bottom: 8px;
-}
+    .sub {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
 
-.kpi {
-  font-size: 28px;
-  font-weight: 800;
-  line-height: 1.05;
-}
+    .green { color: var(--green); }
+    .yellow { color: var(--yellow); }
+    .red { color: var(--red); }
+    .blue { color: var(--blue); }
+    .loading { opacity: 0.65; }
 
-.sub {
-  margin-top: 8px;
-  font-size: 13px;
-  color: var(--muted);
-}
+    a.btn {
+      display: block;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.10);
+      padding: 18px;
+      border-radius: 16px;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 800;
+      box-shadow: 0 8px 22px rgba(0,0,0,.18);
+      backdrop-filter: blur(8px);
+      transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
+    }
 
-.green { color: var(--green); }
-.yellow { color: var(--yellow); }
-.red { color: var(--red); }
-.blue { color: var(--blue); }
-.loading { opacity: 0.65; }
+    a.btn:hover {
+      background: rgba(255,255,255,.12);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(0,0,0,.24);
+    }
 
-a.btn {
-  display: block;
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.10);
-  padding: 18px;
-  border-radius: 16px;
-  text-decoration: none;
-  color: var(--text);
-  font-weight: 800;
-  box-shadow: 0 8px 22px rgba(0,0,0,.18);
-  backdrop-filter: blur(8px);
-  transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
-}
+    .muted {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 2px;
+    }
 
-a.btn:hover {
-  background: rgba(255,255,255,.12);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(0,0,0,.24);
-}
+    .footer-note{
+      text-align:center;
+      font-size:12px;
+      color:#94a3b8;
+      padding: 6px 0 12px;
+    }
 
-a.btn:active{
-  transform: translateY(0);
-}
+    .status-on { color: var(--green); font-weight: 900; }
+    .status-off { color: var(--red); font-weight: 900; }
+    .status-other { color: var(--yellow); font-weight: 900; }
 
-.muted {
-  font-size: 12px;
-  color: var(--muted);
-  text-align: center;
-  margin-top: 2px;
-}
+    @media (min-width: 700px) {
+      .grid-2 { grid-template-columns: 1fr 1fr; }
+      .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+      .grid-4 { grid-template-columns: 1fr 1fr; }
+    }
 
-.footer-note{
-  text-align:center;
-  font-size:12px;
-  color:#94a3b8;
-  padding: 6px 0 12px;
-}
-
-.status-on {
-  color: var(--green);
-  font-weight: 900;
-}
-
-.status-off {
-  color: var(--red);
-  font-weight: 900;
-}
-
-.status-other {
-  color: var(--yellow);
-  font-weight: 900;
-}
-
-@media (min-width: 700px) {
-  .grid-2 {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .grid-3 {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-
-  .grid-4 {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-@media (min-width: 1000px) {
-  .grid-4 {
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-  }
-}
-</style>
+    @media (min-width: 1000px) {
+      .grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+    }
+  </style>
 </head>
 
 <body>
-<header>CJT Field App</header>
+  <header>CJT Field App</header>
 
-<div class="wrap">
+  <div class="wrap">
+    <div class="verse-box">
+      <div class="verse-label">Daily Verse</div>
+      <div id="verseText" class="verse-text">Loading verse...</div>
+    </div>
 
-  <div class="verse-box">
-    <div class="verse-label">Daily Verse</div>
-    <div id="verseText" class="verse-text">Loading verse...</div>
+    <div class="section-title">Live Capacity</div>
+    <div class="grid-2">
+      <div class="card">
+        <h2>Midland Open Space</h2>
+        <div id="midlandOpen" class="big-number loading">Loading...</div>
+        <div class="sub">Live from Capacity Dashboard</div>
+      </div>
+
+      <div class="card">
+        <h2>Odessa Open Space</h2>
+        <div id="odessaOpen" class="big-number loading">Loading...</div>
+        <div class="sub">Live from Capacity Dashboard</div>
+      </div>
+    </div>
+
+    <div class="section-title">Oil On Yard</div>
+    <div class="grid-3">
+      <div class="card">
+        <h2>Midland Oil On Yard</h2>
+        <div id="midlandOil" class="big-number loading">Loading...</div>
+        <div class="sub">Rolling total since start date</div>
+      </div>
+
+      <div class="card">
+        <h2>Odessa Oil On Yard</h2>
+        <div id="odessaOil" class="big-number loading">Loading...</div>
+        <div class="sub">Rolling total since start date</div>
+      </div>
+
+      <div class="card">
+        <h2>Combined Oil On Yard</h2>
+        <div id="combinedOil" class="big-number loading">Loading...</div>
+        <div class="sub">Both facilities combined</div>
+      </div>
+    </div>
+
+    <div class="section-title">24 Hour Operations</div>
+    <div class="grid-4">
+      <div class="card">
+        <h2>Midland Processing Hours</h2>
+        <div id="midlandProc" class="kpi loading">Loading...</div>
+      </div>
+
+      <div class="card">
+        <h2>Odessa Processing Hours</h2>
+        <div id="odessaProc" class="kpi loading">Loading...</div>
+      </div>
+
+      <div class="card">
+        <h2>Midland Downtime Hours</h2>
+        <div id="midlandDown" class="kpi loading">Loading...</div>
+      </div>
+
+      <div class="card">
+        <h2>Odessa Downtime Hours</h2>
+        <div id="odessaDown" class="kpi loading">Loading...</div>
+      </div>
+
+      <div class="card">
+        <h2>Midland Status</h2>
+        <div id="midlandStatus" class="kpi loading">Loading...</div>
+      </div>
+
+      <div class="card">
+        <h2>Odessa Status</h2>
+        <div id="odessaStatus" class="kpi loading">Loading...</div>
+      </div>
+
+      <div class="card">
+        <h2>Midland Last Operator</h2>
+        <div id="midlandOperator" class="kpi loading">Loading...</div>
+      </div>
+
+      <div class="card">
+        <h2>Odessa Last Operator</h2>
+        <div id="odessaOperator" class="kpi loading">Loading...</div>
+      </div>
+    </div>
+
+    <div id="lastUpdated" class="muted">Waiting on live data...</div>
+
+    <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLScvZA6r7Nlp5y3KfMqB2SHBV5hKeRXVFVGz7s_RGkc0ioSWZg/viewform" target="_blank">CJT Tank Levels</a>
+    <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSdjyN2IfoZTlYmSfGk9GrTbvs-uX7JyBUjGpZTHQg7o4kjGMQ/viewform" target="_blank">Driver Pre Trip Inspection</a>
+    <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSe-bXzKUNqqX6doGBI2lDKWOBpI4zVyLcT2RWzi4ECenynpiQ/viewform" target="_blank">Driver Loader Tracker</a>
+    <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSeRBl8u1W-MkQWCsHBejOWgxugN30eF7VE1_VH4ASVaUgb0ng/viewform" target="_blank">Offload Log</a>
+    <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLScz3_nfZaCuZjce2TwjcqwgdXTabMn205amwdUyor3GXwuvqA/viewform" target="_blank">Oil Sales Report</a>
+    <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSfqmb4-FSJQlIILMDa2IqIhYwao8T1AtzqpHHoZVi4mZMDlGA/viewform" target="_blank">Centrifuge Health Log</a>
+    <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSfI_mcJyZ9qFtrJnaLN6tj3lT8KFqBgQ2Dn65C43DLyUPsi5Q/viewform" target="_blank">Decanter Flush Log</a>
+    <a class="btn" href="https://docs.google.com/spreadsheets/d/18F9w2pAFuSukRMoEHIF0bj6gyc8yPEKJh0udq2u0_yM/edit?gid=0#gid=0" target="_blank">Capacity Dashboard</a>
+
+    <div class="footer-note">CJT Live Operations Dashboard</div>
   </div>
 
-  <div class="section-title">Live Capacity</div>
-  <div class="grid-2">
-    <div class="card">
-      <h2>Midland Open Space</h2>
-      <div id="midlandOpen" class="big-number loading">Loading...</div>
-      <div class="sub">Live from Capacity Dashboard</div>
-    </div>
+  <script>
+    const verses = [
+      "Joshua 1:9 — Be strong and courageous. The Lord your God is with you.",
+      "Psalm 23:1 — The Lord is my shepherd; I shall not want.",
+      "Psalm 46:1 — God is our refuge and strength.",
+      "Psalm 118:24 — This is the day the Lord has made.",
+      "Proverbs 3:5 — Trust in the Lord with all your heart.",
+      "Isaiah 40:31 — Those who hope in the Lord renew their strength.",
+      "Isaiah 41:10 — Fear not, for I am with you.",
+      "Jeremiah 29:11 — I know the plans I have for you.",
+      "Matthew 6:33 — Seek first the kingdom of God.",
+      "Matthew 19:26 — With God all things are possible.",
+      "John 3:16 — For God so loved the world.",
+      "John 10:10 — I have come that they may have life.",
+      "Romans 8:28 — God works all things for good.",
+      "Philippians 4:6 — Do not be anxious about anything.",
+      "Philippians 4:13 — I can do all things through Christ.",
+      "2 Timothy 1:7 — God gave us power, love, and self-control.",
+      "Hebrews 11:1 — Faith is confidence in what we hope for.",
+      "James 1:5 — Ask God for wisdom.",
+      "1 Peter 5:7 — Cast all your anxiety on Him.",
+      "Revelation 21:4 — He will wipe every tear away."
+    ];
 
-    <div class="card">
-      <h2>Odessa Open Space</h2>
-      <div id="odessaOpen" class="big-number loading">Loading...</div>
-      <div class="sub">Live from Capacity Dashboard</div>
-    </div>
-  </div>
-
-  <div class="section-title">Oil On Yard</div>
-  <div class="grid-3">
-    <div class="card">
-      <h2>Midland Oil On Yard</h2>
-      <div id="midlandOil" class="big-number loading">Loading...</div>
-      <div class="sub">Rolling total since start date</div>
-    </div>
-
-    <div class="card">
-      <h2>Odessa Oil On Yard</h2>
-      <div id="odessaOil" class="big-number loading">Loading...</div>
-      <div class="sub">Rolling total since start date</div>
-    </div>
-
-    <div class="card">
-      <h2>Combined Oil On Yard</h2>
-      <div id="combinedOil" class="big-number loading">Loading...</div>
-      <div class="sub">Both facilities combined</div>
-    </div>
-  </div>
-
-  <div class="section-title">24 Hour Operations</div>
-  <div class="grid-4">
-    <div class="card">
-      <h2>Midland Processing Hours</h2>
-      <div id="midlandProc" class="kpi loading">Loading...</div>
-    </div>
-
-    <div class="card">
-      <h2>Odessa Processing Hours</h2>
-      <div id="odessaProc" class="kpi loading">Loading...</div>
-    </div>
-
-    <div class="card">
-      <h2>Midland Downtime Hours</h2>
-      <div id="midlandDown" class="kpi loading">Loading...</div>
-    </div>
-
-    <div class="card">
-      <h2>Odessa Downtime Hours</h2>
-      <div id="odessaDown" class="kpi loading">Loading...</div>
-    </div>
-
-    <div class="card">
-      <h2>Midland Status</h2>
-      <div id="midlandStatus" class="kpi loading">Loading...</div>
-    </div>
-
-    <div class="card">
-      <h2>Odessa Status</h2>
-      <div id="odessaStatus" class="kpi loading">Loading...</div>
-    </div>
-
-    <div class="card">
-      <h2>Midland Last Operator</h2>
-      <div id="midlandOperator" class="kpi loading">Loading...</div>
-    </div>
-
-    <div class="card">
-      <h2>Odessa Last Operator</h2>
-      <div id="odessaOperator" class="kpi loading">Loading...</div>
-    </div>
-  </div>
-
-  <div id="lastUpdated" class="muted">Waiting on live data...</div>
-
-  <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLScvZA6r7Nlp5y3KfMqB2SHBV5hKeRXVFVGz7s_RGkc0ioSWZg/viewform" target="_blank">CJT Tank Levels</a>
-  <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSdjyN2IfoZTlYmSfGk9GrTbvs-uX7JyBUjGpZTHQg7o4kjGMQ/viewform" target="_blank">Driver Pre Trip Inspection</a>
-  <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSe-bXzKUNqqX6doGBI2lDKWOBpI4zVyLcT2RWzi4ECenynpiQ/viewform" target="_blank">Driver Loader Tracker</a>
-  <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSeRBl8u1W-MkQWCsHBejOWgxugN30eF7VE1_VH4ASVaUgb0ng/viewform" target="_blank">Offload Log</a>
-  <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLScz3_nfZaCuZjce2TwjcqwgdXTabMn205amwdUyor3GXwuvqA/viewform" target="_blank">Oil Sales Report</a>
-  <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSfqmb4-FSJQlIILMDa2IqIhYwao8T1AtzqpHHoZVi4mZMDlGA/viewform" target="_blank">Centrifuge Health Log</a>
-  <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSfI_mcJyZ9qFtrJnaLN6tj3lT8KFqBgQ2Dn65C43DLyUPsi5Q/viewform" target="_blank">Decanter Flush Log</a>
-  <a class="btn" href="https://docs.google.com/spreadsheets/d/18F9w2pAFuSukRMoEHIF0bj6gyc8yPEKJh0udq2u0_yM/edit?gid=0#gid=0" target="_blank">Capacity Dashboard</a>
-
-  <div class="footer-note">CJT Live Operations Dashboard</div>
-</div>
-
-<script>
-const verses = [
-"Genesis 1:1 — In the beginning God created the heavens and the earth.",
-"Genesis 50:20 — What you meant for evil, God meant for good.",
-"Exodus 14:14 — The Lord will fight for you; you need only to be still.",
-"Deuteronomy 31:6 — Be strong and courageous. Do not fear.",
-"Joshua 1:9 — Be strong and courageous. The Lord your God is with you.",
-"1 Samuel 16:7 — The Lord looks at the heart.",
-"2 Samuel 22:31 — God’s way is perfect.",
-"1 Kings 8:57 — May the Lord our God be with us.",
-"2 Chronicles 7:14 — If my people humble themselves and pray.",
-"Nehemiah 8:10 — The joy of the Lord is your strength.",
-"Job 19:25 — I know that my Redeemer lives.",
-"Psalm 1:1 — Blessed is the one who does not walk in step with the wicked.",
-"Psalm 18:2 — The Lord is my rock and my fortress.",
-"Psalm 23:1 — The Lord is my shepherd; I shall not want.",
-"Psalm 27:1 — The Lord is my light and my salvation.",
-"Psalm 34:8 — Taste and see that the Lord is good.",
-"Psalm 37:4 — Delight yourself in the Lord.",
-"Psalm 46:1 — God is our refuge and strength.",
-"Psalm 55:22 — Cast your cares on the Lord.",
-"Psalm 56:3 — When I am afraid, I put my trust in you.",
-"Psalm 62:6 — He alone is my rock and salvation.",
-"Psalm 73:26 — God is the strength of my heart.",
-"Psalm 91:2 — My refuge and my fortress.",
-"Psalm 100:5 — The Lord is good and his love endures forever.",
-"Psalm 118:24 — This is the day the Lord has made.",
-"Proverbs 3:5 — Trust in the Lord with all your heart.",
-"Proverbs 16:3 — Commit your work to the Lord.",
-"Proverbs 18:10 — The name of the Lord is a strong tower.",
-"Isaiah 26:3 — You will keep in perfect peace.",
-"Isaiah 40:31 — Those who hope in the Lord renew their strength.",
-"Isaiah 41:10 — Fear not, for I am with you.",
-"Isaiah 43:2 — When you pass through waters, I will be with you.",
-"Isaiah 54:17 — No weapon formed against you shall prosper.",
-"Jeremiah 29:11 — I know the plans I have for you.",
-"Lamentations 3:22 — His mercies are new every morning.",
-"Ezekiel 36:26 — I will give you a new heart.",
-"Daniel 2:20 — Wisdom and power belong to God.",
-"Joel 2:25 — I will restore the years the locusts have eaten.",
-"Micah 6:8 — Act justly, love mercy, walk humbly.",
-"Zephaniah 3:17 — The Lord rejoices over you.",
-"Matthew 5:16 — Let your light shine before others.",
-"Matthew 6:33 — Seek first the kingdom of God.",
-"Matthew 7:7 — Ask and it will be given to you.",
-"Matthew 11:28 — Come to me all who are weary.",
-"Matthew 19:26 — With God all things are possible.",
-"Matthew 22:37 — Love the Lord your God.",
-"Mark 10:27 — All things are possible with God.",
-"Luke 1:37 — Nothing is impossible with God.",
-"Luke 6:31 — Do to others as you would have them do to you.",
-"John 1:5 — The light shines in the darkness.",
-"John 3:16 — For God so loved the world.",
-"John 8:12 — I am the light of the world.",
-"John 10:10 — I have come that they may have life.",
-"John 11:25 — I am the resurrection and the life.",
-"John 13:34 — Love one another.",
-"John 14:6 — I am the way, the truth, and the life.",
-"John 15:5 — Apart from me you can do nothing.",
-"Acts 1:8 — You will receive power.",
-"Romans 5:8 — God demonstrates his love for us.",
-"Romans 8:28 — God works all things for good.",
-"Romans 8:31 — If God is for us who can be against us.",
-"Romans 12:2 — Be transformed by the renewing of your mind.",
-"1 Corinthians 10:13 — God will provide a way out.",
-"1 Corinthians 13:13 — Faith, hope, and love remain.",
-"2 Corinthians 5:7 — Walk by faith, not by sight.",
-"2 Corinthians 12:9 — My grace is sufficient for you.",
-"Galatians 5:22 — The fruit of the Spirit is love.",
-"Ephesians 2:8 — By grace you have been saved.",
-"Ephesians 3:20 — God can do immeasurably more.",
-"Ephesians 6:10 — Be strong in the Lord.",
-"Philippians 1:6 — He who began a good work will finish it.",
-"Philippians 4:6 — Do not be anxious about anything.",
-"Philippians 4:13 — I can do all things through Christ.",
-"Colossians 3:23 — Work heartily as for the Lord.",
-"1 Thessalonians 5:16 — Rejoice always.",
-"1 Thessalonians 5:17 — Pray continually.",
-"2 Thessalonians 3:3 — The Lord is faithful.",
-"1 Timothy 6:12 — Fight the good fight of faith.",
-"2 Timothy 1:7 — God gave us power, love, and self-control.",
-"Titus 2:11 — The grace of God has appeared.",
-"Hebrews 4:16 — Approach God’s throne with confidence.",
-"Hebrews 11:1 — Faith is confidence in what we hope for.",
-"Hebrews 13:8 — Jesus Christ is the same yesterday and today.",
-"James 1:5 — Ask God for wisdom.",
-"James 1:12 — Blessed is the one who perseveres.",
-"1 Peter 5:7 — Cast all your anxiety on Him.",
-"2 Peter 3:9 — The Lord is patient.",
-"1 John 4:8 — God is love.",
-"1 John 4:19 — We love because He first loved us.",
-"Jude 1:24 — He is able to keep you from falling.",
-"Revelation 3:20 — I stand at the door and knock.",
-"Revelation 21:4 — He will wipe every tear away.",
-"Psalm 19:14 — Let the words of my mouth and the meditation of my heart be pleasing to you.",
-"Psalm 121:1 — I lift up my eyes to the hills. My help comes from the Lord.",
-"Isaiah 30:21 — This is the way; walk in it.",
-"Jeremiah 33:3 — Call to me and I will answer you.",
-"John 16:33 — Take heart; I have overcome the world.",
-"Romans 15:13 — May the God of hope fill you with all joy and peace.",
-"1 Corinthians 16:13 — Be on your guard; stand firm in the faith; be courageous; be strong.",
-"Galatians 6:9 — Let us not grow weary of doing good.",
-"Ephesians 4:32 — Be kind and compassionate to one another.",
-"Colossians 3:2 — Set your minds on things above.",
-"Hebrews 12:1 — Let us run with perseverance the race marked out for us.",
-"James 4:8 — Draw near to God and He will draw near to you.",
-"1 John 5:14 — If we ask anything according to His will, He hears us."
-];
-
-function getDailyVerse() {
-  const start = new Date("2026-01-01");
-  const now = new Date();
-  const diff = Math.floor((now - start) / (1000 * 60 * 60 * 24));
-  return verses[Math.abs(diff) % verses.length];
-}
-
-document.getElementById("verseText").innerText = getDailyVerse();
-
-const sheetId = "18F9w2pAFuSukRMoEHIF0bj6gyc8yPEKJh0udq2u0_yM";
-
-const capacityURL = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${encodeURIComponent("Capacity Dashboard")}&tqx=out:json`;
-const opsURL = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${encodeURIComponent("Centrifuge_Stats")}&tqx=out:json`;
-
-function cleanNumber(value) {
-  if (value === null || value === undefined || value === "") return 0;
-  const num = Number(value);
-  return isNaN(num) ? 0 : num;
-}
-
-function fmtBbl(value) {
-  return `${Math.round(cleanNumber(value)).toLocaleString()} bbl`;
-}
-
-function fmtHours(value) {
-  return `${cleanNumber(value).toFixed(1)} hrs`;
-}
-
-function setCapacityColor(el, value) {
-  el.classList.remove("green", "yellow", "red", "loading");
-  const v = cleanNumber(value);
-
-  if (v < 300) {
-    el.classList.add("red");
-  } else if (v <= 1000) {
-    el.classList.add("yellow");
-  } else {
-    el.classList.add("green");
-  }
-}
-
-function setStatusColor(el, value) {
-  el.classList.remove("status-on", "status-off", "status-other", "loading");
-  const v = String(value || "").trim().toUpperCase();
-
-  if (v === "ON" || v === "ACTIVE") {
-    el.classList.add("status-on");
-  } else if (v === "OFF" || v === "SHUTDOWN" || v === "CONSTRUCTION") {
-    el.classList.add("status-off");
-  } else {
-    el.classList.add("status-other");
-  }
-}
-
-function setOilColor(el) {
-  el.classList.remove("green", "yellow", "red", "loading");
-  el.classList.add("blue");
-}
-
-function parseGoogleSheet(text) {
-  return JSON.parse(text.substring(47).slice(0, -2)).table.rows;
-}
-
-function getCellValue(row, colIndex) {
-  if (!row || !row.c || !row.c[colIndex] || typeof row.c[colIndex].v === "undefined") {
-    return "";
-  }
-  return row.c[colIndex].v;
-}
-
-function findMetricRow(rows, metricName) {
-  for (const row of rows) {
-    if (!row || !row.c) continue;
-
-    for (let i = 0; i < row.c.length; i++) {
-      const val = row.c[i] && typeof row.c[i].v !== "undefined" ? String(row.c[i].v).trim() : "";
-      if (val === metricName) {
-        return {
-          midland: row.c[i + 1] && typeof row.c[i + 1].v !== "undefined" ? row.c[i + 1].v : "",
-          odessa: row.c[i + 2] && typeof row.c[i + 2].v !== "undefined" ? row.c[i + 2].v : ""
-        };
-      }
+    function getDailyVerse() {
+      const start = new Date("2026-01-01");
+      const now = new Date();
+      const diff = Math.floor((now - start) / (1000 * 60 * 60 * 24));
+      return verses[Math.abs(diff) % verses.length];
     }
-  }
-  return { midland: "", odessa: "" };
-}
 
-// CAPACITY + OIL
-fetch(capacityURL)
-  .then(res => res.text())
-  .then(text => {
-    const rows = parseGoogleSheet(text);
+    document.getElementById("verseText").innerText = getDailyVerse();
 
-    const midlandOpen = cleanNumber(getCellValue(rows[6], 1));  // B7
-    const odessaOpen = cleanNumber(getCellValue(rows[6], 2));   // C7
+    const sheetId = "18F9w2pAFuSukRMoEHIF0bj6gyc8yPEKJh0udq2u0_yM";
+    const capacityURL = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${encodeURIComponent("Capacity Dashboard")}&tqx=out:json`;
+    const opsURL = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${encodeURIComponent("Centrifuge_Stats")}&tqx=out:json`;
 
-    const midlandOil = cleanNumber(getCellValue(rows[5], 10));  // K6
-    const odessaOil = cleanNumber(getCellValue(rows[5], 11));   // L6
-    const combinedOil = cleanNumber(getCellValue(rows[7], 10)); // K8
+    function cleanNumber(value) {
+      if (value === null || value === undefined || value === "") return 0;
+      const num = Number(value);
+      return isNaN(num) ? 0 : num;
+    }
 
-    const midlandOpenEl = document.getElementById("midlandOpen");
-    const odessaOpenEl = document.getElementById("odessaOpen");
-    const midlandOilEl = document.getElementById("midlandOil");
-    const odessaOilEl = document.getElementById("odessaOil");
-    const combinedOilEl = document.getElementById("combinedOil");
+    function fmtBbl(value) {
+      return `${Math.round(cleanNumber(value)).toLocaleString()} bbl`;
+    }
 
-    midlandOpenEl.textContent = fmtBbl(midlandOpen);
-    odessaOpenEl.textContent = fmtBbl(odessaOpen);
-    midlandOilEl.textContent = fmtBbl(midlandOil);
-    odessaOilEl.textContent = fmtBbl(odessaOil);
-    combinedOilEl.textContent = fmtBbl(combinedOil);
+    function fmtHours(value) {
+      return `${cleanNumber(value).toFixed(1)} hrs`;
+    }
 
-    setCapacityColor(midlandOpenEl, midlandOpen);
-    setCapacityColor(odessaOpenEl, odessaOpen);
-    setOilColor(midlandOilEl);
-    setOilColor(odessaOilEl);
-    setOilColor(combinedOilEl);
-  })
-  .catch(err => {
-    console.error("Capacity/Oil load error:", err);
-    [
-      "midlandOpen","odessaOpen","midlandOil","odessaOil","combinedOil"
-    ].forEach(id => {
-      document.getElementById(id).textContent = "Error";
-    });
-  });
+    function setCapacityColor(el, value) {
+      el.classList.remove("green", "yellow", "red", "loading");
+      const v = cleanNumber(value);
 
-// OPERATIONS
-fetch(opsURL)
-  .then(res => res.text())
-  .then(text => {
-    const rows = parseGoogleSheet(text);
+      if (v < 300) el.classList.add("red");
+      else if (v <= 1000) el.classList.add("yellow");
+      else el.classList.add("green");
+    }
 
-    const proc = findMetricRow(rows, "Processing Hours (24h)");
-    const down = findMetricRow(rows, "Downtime Hours (24h)");
-    const status = findMetricRow(rows, "Current Status");
-    const operator = findMetricRow(rows, "Last Operator");
+    function setStatusColor(el, value) {
+      el.classList.remove("status-on", "status-off", "status-other", "loading");
+      const v = String(value || "").trim().toUpperCase();
 
-    const midlandProc = cleanNumber(proc.midland);
-    const odessaProc = cleanNumber(proc.odessa);
+      if (v === "ON" || v === "ACTIVE") el.classList.add("status-on");
+      else if (v === "OFF" || v === "SHUTDOWN" || v === "CONSTRUCTION") el.classList.add("status-off");
+      else el.classList.add("status-other");
+    }
 
-    const midlandDown = cleanNumber(down.midland);
-    const odessaDown = cleanNumber(down.odessa);
+    function setOilColor(el) {
+      el.classList.remove("green", "yellow", "red", "loading");
+      el.classList.add("blue");
+    }
 
-    const midlandStatus = String(status.midland || "Unknown");
-    const odessaStatus = String(status.odessa || "Unknown");
+    function parseGoogleSheet(text) {
+      return JSON.parse(text.substring(47).slice(0, -2)).table.rows;
+    }
 
-    const midlandOperator = String(operator.midland || "Unknown");
-    const odessaOperator = String(operator.odessa || "Unknown");
+    function getCellValue(row, colIndex) {
+      if (!row || !row.c || !row.c[colIndex] || typeof row.c[colIndex].v === "undefined") {
+        return "";
+      }
+      return row.c[colIndex].v;
+    }
 
-    const midlandProcEl = document.getElementById("midlandProc");
-    const odessaProcEl = document.getElementById("odessaProc");
-    const midlandDownEl = document.getElementById("midlandDown");
-    const odessaDownEl = document.getElementById("odessaDown");
-    const midlandStatusEl = document.getElementById("midlandStatus");
-    const odessaStatusEl = document.getElementById("odessaStatus");
-    const midlandOperatorEl = document.getElementById("midlandOperator");
-    const odessaOperatorEl = document.getElementById("odessaOperator");
+    function findMetricRow(rows, metricName) {
+      for (const row of rows) {
+        if (!row || !row.c) continue;
 
-    midlandProcEl.textContent = fmtHours(midlandProc);
-    odessaProcEl.textContent = fmtHours(odessaProc);
-    midlandDownEl.textContent = fmtHours(midlandDown);
-    odessaDownEl.textContent = fmtHours(odessaDown);
-    midlandStatusEl.textContent = midlandStatus;
-    odessaStatusEl.textContent = odessaStatus;
-    midlandOperatorEl.textContent = midlandOperator;
-    odessaOperatorEl.textContent = odessaOperator;
+        for (let i = 0; i < row.c.length; i++) {
+          const val = row.c[i] && typeof row.c[i].v !== "undefined" ? String(row.c[i].v).trim() : "";
+          if (val === metricName) {
+            return {
+              midland: row.c[i + 1] && typeof row.c[i + 1].v !== "undefined" ? row.c[i + 1].v : "",
+              odessa: row.c[i + 2] && typeof row.c[i + 2].v !== "undefined" ? row.c[i + 2].v : ""
+            };
+          }
+        }
+      }
+      return { midland: "", odessa: "" };
+    }
 
-    setStatusColor(midlandStatusEl, midlandStatus);
-    setStatusColor(odessaStatusEl, odessaStatus);
-  })
-  .catch(err => {
-    console.error("Operations load error:", err);
-    [
-      "midlandProc","odessaProc","midlandDown","odessaDown",
-      "midlandStatus","odessaStatus","midlandOperator","odessaOperator"
-    ].forEach(id => {
-      document.getElementById(id).textContent = "Error";
-    });
-  })
-  .finally(() => {
-    document.getElementById("lastUpdated").textContent =
-      `Last updated: ${new Date().toLocaleString()}`;
-  });
+    // Capacity + Oil
+    fetch(capacityURL)
+      .then(res => res.text())
+      .then(text => {
+        const rows = parseGoogleSheet(text);
 
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js");
-}
-</script>
+        const midlandOpen = cleanNumber(getCellValue(rows[6], 1));
+        const odessaOpen = cleanNumber(getCellValue(rows[6], 2));
 
+        const midlandOil = cleanNumber(getCellValue(rows[5], 10));
+        const odessaOil = cleanNumber(getCellValue(rows[5], 11));
+        const combinedOil = cleanNumber(getCellValue(rows[7], 10));
+
+        const midlandOpenEl = document.getElementById("midlandOpen");
+        const odessaOpenEl = document.getElementById("odessaOpen");
+        const midlandOilEl = document.getElementById("midlandOil");
+        const odessaOilEl = document.getElementById("odessaOil");
+        const combinedOilEl = document.getElementById("combinedOil");
+
+        midlandOpenEl.textContent = fmtBbl(midlandOpen);
+        odessaOpenEl.textContent = fmtBbl(odessaOpen);
+        midlandOilEl.textContent = fmtBbl(midlandOil);
+        odessaOilEl.textContent = fmtBbl(odessaOil);
+        combinedOilEl.textContent = fmtBbl(combinedOil);
+
+        setCapacityColor(midlandOpenEl, midlandOpen);
+        setCapacityColor(odessaOpenEl, odessaOpen);
+        setOilColor(midlandOilEl);
+        setOilColor(odessaOilEl);
+        setOilColor(combinedOilEl);
+      })
+      .catch(err => {
+        console.error("Capacity/Oil load error:", err);
+        ["midlandOpen","odessaOpen","midlandOil","odessaOil","combinedOil"].forEach(id => {
+          document.getElementById(id).textContent = "Error";
+        });
+      });
+
+    // Operations
+    fetch(opsURL)
+      .then(res => res.text())
+      .then(text => {
+        const rows = parseGoogleSheet(text);
+
+        const proc = findMetricRow(rows, "Processing Hours (24h)");
+        const down = findMetricRow(rows, "Downtime Hours (24h)");
+        const status = findMetricRow(rows, "Current Status");
+        const operator = findMetricRow(rows, "Last Operator");
+
+        const midlandProc = cleanNumber(proc.midland);
+        const odessaProc = cleanNumber(proc.odessa);
+        const midlandDown = cleanNumber(down.midland);
+        const odessaDown = cleanNumber(down.odessa);
+        const midlandStatus = String(status.midland || "Unknown");
+        const odessaStatus = String(status.odessa || "Unknown");
+        const midlandOperator = String(operator.midland || "Unknown");
+        const odessaOperator = String(operator.odessa || "Unknown");
+
+        const midlandProcEl = document.getElementById("midlandProc");
+        const odessaProcEl = document.getElementById("odessaProc");
+        const midlandDownEl = document.getElementById("midlandDown");
+        const odessaDownEl = document.getElementById("odessaDown");
+        const midlandStatusEl = document.getElementById("midlandStatus");
+        const odessaStatusEl = document.getElementById("odessaStatus");
+        const midlandOperatorEl = document.getElementById("midlandOperator");
+        const odessaOperatorEl = document.getElementById("odessaOperator");
+
+        midlandProcEl.textContent = fmtHours(midlandProc);
+        odessaProcEl.textContent = fmtHours(odessaProc);
+        midlandDownEl.textContent = fmtHours(midlandDown);
+        odessaDownEl.textContent = fmtHours(odessaDown);
+        midlandStatusEl.textContent = midlandStatus;
+        odessaStatusEl.textContent = odessaStatus;
+        midlandOperatorEl.textContent = midlandOperator;
+        odessaOperatorEl.textContent = odessaOperator;
+
+        setStatusColor(midlandStatusEl, midlandStatus);
+        setStatusColor(odessaStatusEl, odessaStatus);
+      })
+      .catch(err => {
+        console.error("Operations load error:", err);
+        [
+          "midlandProc","odessaProc","midlandDown","odessaDown",
+          "midlandStatus","odessaStatus","midlandOperator","odessaOperator"
+        ].forEach(id => {
+          document.getElementById(id).textContent = "Error";
+        });
+      })
+      .finally(() => {
+        document.getElementById("lastUpdated").textContent =
+          `Last updated: ${new Date().toLocaleString()}`;
+      });
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("sw.js");
+    }
+  </script>
 </body>
 </html>
