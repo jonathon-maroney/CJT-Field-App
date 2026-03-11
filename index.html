@@ -10,34 +10,110 @@
 
 <style>
 body {
-  margin:0;
+  margin: 0;
   font-family: Arial, sans-serif;
-  background:#f4f4f4;
+  background: #f4f4f4;
+  color: #111;
 }
+
 header {
-  background:#111;
-  color:white;
-  padding:18px;
-  font-size:20px;
-  font-weight:700;
+  background: #111;
+  color: white;
+  padding: 18px;
+  font-size: 20px;
+  font-weight: 700;
 }
+
 .wrap {
-  padding:16px;
-  display:grid;
-  gap:14px;
+  padding: 16px;
+  display: grid;
+  gap: 14px;
 }
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 6px 0 2px;
+}
+
+.capacity-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.movement-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.card {
+  background: white;
+  padding: 18px;
+  border-radius: 14px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+}
+
+.card h2 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  color: #444;
+}
+
+.big-number {
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.kpi {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.sub {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #666;
+}
+
+.green { color: #16a34a; }
+.yellow { color: #ca8a04; }
+.red { color: #dc2626; }
+.loading { opacity: 0.65; }
+
 a.btn {
-  display:block;
-  background:white;
-  padding:18px;
-  border-radius:14px;
-  text-decoration:none;
-  color:#111;
-  font-weight:700;
-  box-shadow:0 2px 6px rgba(0,0,0,.08);
+  display: block;
+  background: white;
+  padding: 18px;
+  border-radius: 14px;
+  text-decoration: none;
+  color: #111;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(0,0,0,.08);
 }
+
 a.btn:hover {
-  background:#eaeaea;
+  background: #eaeaea;
+}
+
+.muted {
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+  margin-top: 2px;
+}
+
+@media (min-width: 700px) {
+  .capacity-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .movement-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 </style>
 </head>
@@ -47,23 +123,203 @@ a.btn:hover {
 
 <div class="wrap">
 
-<a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLScvZA6r7Nlp5y3KfMqB2SHBV5hKeRXVFVGz7s_RGkc0ioSWZg/viewform" target="_blank">CJT Tank Levels</a>
+  <div class="section-title">Live Capacity</div>
 
-<a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSdjyN2IfoZTlYmSfGk9GrTbvs-uX7JyBUjGpZTHQg7o4kjGMQ/viewform" target="_blank">Driver Pre Trip Inspection</a>
+  <div class="capacity-grid">
+    <div class="card">
+      <h2>Midland Open Space</h2>
+      <div id="midlandOpen" class="big-number loading">Loading...</div>
+      <div class="sub">Live from Capacity Dashboard</div>
+    </div>
 
-<a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSe-bXzKUNqqX6doGBI2lDKWOBpI4zVyLcT2RWzi4ECenynpiQ/viewform" target="_blank">Driver Loader Tracker</a>
+    <div class="card">
+      <h2>Odessa Open Space</h2>
+      <div id="odessaOpen" class="big-number loading">Loading...</div>
+      <div class="sub">Live from Capacity Dashboard</div>
+    </div>
+  </div>
 
-<a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSeRBl8u1W-MkQWCsHBejOWgxugN30eF7VE1_VH4ASVaUgb0ng/viewform" target="_blank">Offload Log</a>
+  <div class="section-title">Today’s Movement</div>
 
-<a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLScz3_nfZaCuZjce2TwjcqwgdXTabMn205amwdUyor3GXwuvqA/viewform" target="_blank">Oil Sales Report</a>
+  <div class="movement-grid">
+    <div class="card">
+      <h2>Midland Loads In</h2>
+      <div id="midlandIn" class="kpi loading">Loading...</div>
+    </div>
 
-<a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSfqmb4-FSJQlIILMDa2IqIhYwao8T1AtzqpHHoZVi4mZMDlGA/viewform" target="_blank">Centrifuge Health Log</a>
+    <div class="card">
+      <h2>Midland Loads Out</h2>
+      <div id="midlandOut" class="kpi loading">Loading...</div>
+    </div>
 
-<a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSfI_mcJyZ9qFtrJnaLN6tj3lT8KFqBgQ2Dn65C43DLyUPsi5Q/viewform" target="_blank">Decanter Flush Log</a>
+    <div class="card">
+      <h2>Odessa Loads In</h2>
+      <div id="odessaIn" class="kpi loading">Loading...</div>
+    </div>
+
+    <div class="card">
+      <h2>Odessa Loads Out</h2>
+      <div id="odessaOut" class="kpi loading">Loading...</div>
+    </div>
+
+    <div class="card">
+      <h2>Midland Net Change</h2>
+      <div id="midlandNet" class="kpi loading">Loading...</div>
+    </div>
+
+    <div class="card">
+      <h2>Odessa Net Change</h2>
+      <div id="odessaNet" class="kpi loading">Loading...</div>
+    </div>
+  </div>
+
+  <div id="lastUpdated" class="muted">Waiting on live data...</div>
+
+  <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLScvZA6r7Nlp5y3KfMqB2SHBV5hKeRXVFVGz7s_RGkc0ioSWZg/viewform" target="_blank">CJT Tank Levels</a>
+
+  <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSdjyN2IfoZTlYmSfGk9GrTbvs-uX7JyBUjGpZTHQg7o4kjGMQ/viewform" target="_blank">Driver Pre Trip Inspection</a>
+
+  <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSe-bXzKUNqqX6doGBI2lDKWOBpI4zVyLcT2RWzi4ECenynpiQ/viewform" target="_blank">Driver Loader Tracker</a>
+
+  <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSeRBl8u1W-MkQWCsHBejOWgxugN30eF7VE1_VH4ASVaUgb0ng/viewform" target="_blank">Offload Log</a>
+
+  <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLScz3_nfZaCuZjce2TwjcqwgdXTabMn205amwdUyor3GXwuvqA/viewform" target="_blank">Oil Sales Report</a>
+
+  <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSfqmb4-FSJQlIILMDa2IqIhYwao8T1AtzqpHHoZVi4mZMDlGA/viewform" target="_blank">Centrifuge Health Log</a>
+
+  <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSfI_mcJyZ9qFtrJnaLN6tj3lT8KFqBgQ2Dn65C43DLyUPsi5Q/viewform" target="_blank">Decanter Flush Log</a>
+
+  <a class="btn" href="https://docs.google.com/spreadsheets/d/18F9w2pAFuSukRMoEHIF0bj6gyc8yPEKJh0udq2u0_yM/edit?gid=0#gid=0" target="_blank">Capacity Dashboard</a>
 
 </div>
 
 <script>
+const sheetId = "18F9w2pAFuSukRMoEHIF0bj6gyc8yPEKJh0udq2u0_yM";
+const sheetName = "Capacity Dashboard";
+const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&tqx=out:json`;
+
+function cleanNumber(value) {
+  if (value === null || value === undefined || value === "") return 0;
+  const num = Number(value);
+  return isNaN(num) ? 0 : num;
+}
+
+function fmtBbl(value) {
+  return `${Math.round(cleanNumber(value)).toLocaleString()} bbl`;
+}
+
+function setCapacityColor(el, value) {
+  el.classList.remove("green", "yellow", "red", "loading");
+  const v = cleanNumber(value);
+
+  if (v < 300) {
+    el.classList.add("red");
+  } else if (v <= 1000) {
+    el.classList.add("yellow");
+  } else {
+    el.classList.add("green");
+  }
+}
+
+function setNetColor(el, value) {
+  el.classList.remove("green", "yellow", "red", "loading");
+  const v = cleanNumber(value);
+
+  if (v > 0) {
+    el.classList.add("yellow");
+  } else if (v < 0) {
+    el.classList.add("green");
+  } else {
+    el.classList.add("red");
+  }
+}
+
+function getCellValue(cell) {
+  return cell && typeof cell.v !== "undefined" ? cell.v : 0;
+}
+
+fetch(url)
+  .then(res => res.text())
+  .then(text => {
+    const json = JSON.parse(text.substring(47).slice(0, -2));
+    const rows = json.table.rows;
+
+    let midlandIn = 0;
+    let odessaIn = 0;
+    let midlandOut = 0;
+    let odessaOut = 0;
+    let midlandOpen = 0;
+    let odessaOpen = 0;
+
+    rows.forEach(row => {
+      const label = row.c && row.c[0] ? String(row.c[0].v).trim() : "";
+      const midlandVal = getCellValue(row.c[1]);
+      const odessaVal = getCellValue(row.c[2]);
+
+      if (label === "Loads In") {
+        midlandIn = cleanNumber(midlandVal);
+        odessaIn = cleanNumber(odessaVal);
+      }
+
+      if (label === "Loads Out") {
+        midlandOut = cleanNumber(midlandVal);
+        odessaOut = cleanNumber(odessaVal);
+      }
+
+      if (label === "Available Capacity") {
+        midlandOpen = cleanNumber(midlandVal);
+        odessaOpen = cleanNumber(odessaVal);
+      }
+    });
+
+    const midlandNet = midlandIn - midlandOut;
+    const odessaNet = odessaIn - odessaOut;
+
+    const midlandOpenEl = document.getElementById("midlandOpen");
+    const odessaOpenEl = document.getElementById("odessaOpen");
+    const midlandInEl = document.getElementById("midlandIn");
+    const odessaInEl = document.getElementById("odessaIn");
+    const midlandOutEl = document.getElementById("midlandOut");
+    const odessaOutEl = document.getElementById("odessaOut");
+    const midlandNetEl = document.getElementById("midlandNet");
+    const odessaNetEl = document.getElementById("odessaNet");
+
+    midlandOpenEl.textContent = fmtBbl(midlandOpen);
+    odessaOpenEl.textContent = fmtBbl(odessaOpen);
+    midlandInEl.textContent = fmtBbl(midlandIn);
+    odessaInEl.textContent = fmtBbl(odessaIn);
+    midlandOutEl.textContent = fmtBbl(midlandOut);
+    odessaOutEl.textContent = fmtBbl(odessaOut);
+    midlandNetEl.textContent = fmtBbl(midlandNet);
+    odessaNetEl.textContent = fmtBbl(odessaNet);
+
+    setCapacityColor(midlandOpenEl, midlandOpen);
+    setCapacityColor(odessaOpenEl, odessaOpen);
+    setNetColor(midlandNetEl, midlandNet);
+    setNetColor(odessaNetEl, odessaNet);
+
+    midlandInEl.classList.remove("loading");
+    odessaInEl.classList.remove("loading");
+    midlandOutEl.classList.remove("loading");
+    odessaOutEl.classList.remove("loading");
+
+    document.getElementById("lastUpdated").textContent =
+      `Last updated: ${new Date().toLocaleString()}`;
+  })
+  .catch(err => {
+    console.error("Dashboard load error:", err);
+    document.getElementById("midlandOpen").textContent = "Error";
+    document.getElementById("odessaOpen").textContent = "Error";
+    document.getElementById("midlandIn").textContent = "Error";
+    document.getElementById("odessaIn").textContent = "Error";
+    document.getElementById("midlandOut").textContent = "Error";
+    document.getElementById("odessaOut").textContent = "Error";
+    document.getElementById("midlandNet").textContent = "Error";
+    document.getElementById("odessaNet").textContent = "Error";
+    document.getElementById("lastUpdated").textContent =
+      "Could not load live sheet data. Make sure the Capacity Dashboard sheet is shared as Anyone with the link → Viewer.";
+  });
+
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js");
 }
