@@ -1,357 +1,3 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>CJT Field App</title>
-
-<link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#0f172a">
-
-<style>
-:root{
-  --bg1:#0b1220;
-  --bg2:#111827;
-  --card:rgba(255,255,255,.08);
-  --card-border:rgba(255,255,255,.10);
-  --text:#f8fafc;
-  --muted:#cbd5e1;
-  --green:#22c55e;
-  --yellow:#eab308;
-  --red:#ef4444;
-  --blue:#60a5fa;
-}
-
-*{
-  box-sizing:border-box;
-}
-
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  color: var(--text);
-  background:
-    radial-gradient(circle at top left, rgba(37,99,235,.16), transparent 35%),
-    radial-gradient(circle at top right, rgba(34,197,94,.12), transparent 30%),
-    linear-gradient(160deg, var(--bg1), var(--bg2));
-  min-height: 100vh;
-}
-
-header {
-  background: rgba(0,0,0,.28);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255,255,255,.08);
-  color: white;
-  padding: 18px 16px;
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: .3px;
-  text-align: center;
-  position: sticky;
-  top: 0;
-  z-index: 20;
-}
-
-.wrap {
-  padding: 16px;
-  display: grid;
-  gap: 14px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.verse-box{
-  background: rgba(255,255,255,.07);
-  border: 1px solid rgba(255,255,255,.10);
-  border-radius: 18px;
-  padding: 16px;
-  text-align: center;
-  box-shadow: 0 8px 24px rgba(0,0,0,.20);
-  backdrop-filter: blur(8px);
-}
-
-.verse-label{
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #93c5fd;
-  margin-bottom: 8px;
-  font-weight: 700;
-}
-
-.verse-text{
-  font-size: 15px;
-  line-height: 1.5;
-  color: var(--text);
-  opacity: 0;
-  animation: fadeVerse 1.2s ease forwards;
-}
-
-@keyframes fadeVerse{
-  from{
-    opacity:0;
-    transform: translateY(10px);
-  }
-  to{
-    opacity:1;
-    transform: translateY(0);
-  }
-}
-
-.section-title {
-  font-size: 18px;
-  font-weight: 800;
-  margin: 6px 0 2px;
-  color: #e2e8f0;
-}
-
-.grid-2 {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
-
-.grid-3 {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
-
-.grid-4 {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
-
-.card {
-  background: var(--card);
-  border: 1px solid var(--card-border);
-  padding: 20px;
-  border-radius: 18px;
-  box-shadow: 0 10px 28px rgba(0,0,0,.22);
-  backdrop-filter: blur(10px);
-  position: relative;
-  overflow: hidden;
-}
-
-.card::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background: linear-gradient(135deg, rgba(255,255,255,.08), transparent 40%);
-  pointer-events:none;
-}
-
-.card h2 {
-  margin: 0 0 10px;
-  font-size: 16px;
-  color: var(--muted);
-}
-
-.big-number {
-  font-size: 38px;
-  font-weight: 900;
-  line-height: 1.05;
-  margin-bottom: 8px;
-}
-
-.kpi {
-  font-size: 28px;
-  font-weight: 800;
-  line-height: 1.05;
-}
-
-.sub {
-  margin-top: 8px;
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.green { color: var(--green); }
-.yellow { color: var(--yellow); }
-.red { color: var(--red); }
-.blue { color: var(--blue); }
-.loading { opacity: 0.65; }
-
-a.btn {
-  display: block;
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.10);
-  padding: 18px;
-  border-radius: 16px;
-  text-decoration: none;
-  color: var(--text);
-  font-weight: 800;
-  box-shadow: 0 8px 22px rgba(0,0,0,.18);
-  backdrop-filter: blur(8px);
-  transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
-}
-
-a.btn:hover {
-  background: rgba(255,255,255,.12);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(0,0,0,.24);
-}
-
-a.btn:active{
-  transform: translateY(0);
-}
-
-.muted {
-  font-size: 12px;
-  color: var(--muted);
-  text-align: center;
-  margin-top: 2px;
-}
-
-.footer-note{
-  text-align:center;
-  font-size:12px;
-  color:#94a3b8;
-  padding: 6px 0 12px;
-}
-
-.status-on {
-  color: var(--green);
-  font-weight: 900;
-}
-
-.status-off {
-  color: var(--red);
-  font-weight: 900;
-}
-
-.status-other {
-  color: var(--yellow);
-  font-weight: 900;
-}
-
-@media (min-width: 700px) {
-  .grid-2 {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .grid-3 {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-
-  .grid-4 {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-@media (min-width: 1000px) {
-  .grid-4 {
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-  }
-}
-</style>
-</head>
-
-<body>
-<header>CJT Field App</header>
-
-<div class="wrap">
-
-  <div class="verse-box">
-    <div class="verse-label">Daily Verse</div>
-    <div id="verseText" class="verse-text">Loading verse...</div>
-  </div>
-
-  <div class="section-title">Live Capacity</div>
-  <div class="grid-2">
-    <div class="card">
-      <h2>Midland Open Space</h2>
-      <div id="midlandOpen" class="big-number loading">Loading...</div>
-      <div class="sub">Live from Capacity Dashboard</div>
-    </div>
-
-    <div class="card">
-      <h2>Odessa Open Space</h2>
-      <div id="odessaOpen" class="big-number loading">Loading...</div>
-      <div class="sub">Live from Capacity Dashboard</div>
-    </div>
-  </div>
-
-  <div class="section-title">Oil On Yard</div>
-  <div class="grid-3">
-    <div class="card">
-      <h2>Midland Oil On Yard</h2>
-      <div id="midlandOil" class="big-number loading">Loading...</div>
-      <div class="sub">Rolling total since start date</div>
-    </div>
-
-    <div class="card">
-      <h2>Odessa Oil On Yard</h2>
-      <div id="odessaOil" class="big-number loading">Loading...</div>
-      <div class="sub">Rolling total since start date</div>
-    </div>
-
-    <div class="card">
-      <h2>Combined Oil On Yard</h2>
-      <div id="combinedOil" class="big-number loading">Loading...</div>
-      <div class="sub">Both facilities combined</div>
-    </div>
-  </div>
-
-  <div class="section-title">24 Hour Operations</div>
-  <div class="grid-4">
-    <div class="card">
-      <h2>Midland Processing Hours</h2>
-      <div id="midlandProc" class="kpi loading">Loading...</div>
-    </div>
-
-    <div class="card">
-      <h2>Odessa Processing Hours</h2>
-      <div id="odessaProc" class="kpi loading">Loading...</div>
-    </div>
-
-    <div class="card">
-      <h2>Midland Downtime Hours</h2>
-      <div id="midlandDown" class="kpi loading">Loading...</div>
-    </div>
-
-    <div class="card">
-      <h2>Odessa Downtime Hours</h2>
-      <div id="odessaDown" class="kpi loading">Loading...</div>
-    </div>
-
-    <div class="card">
-      <h2>Midland Status</h2>
-      <div id="midlandStatus" class="kpi loading">Loading...</div>
-    </div>
-
-    <div class="card">
-      <h2>Odessa Status</h2>
-      <div id="odessaStatus" class="kpi loading">Loading...</div>
-    </div>
-
-    <div class="card">
-      <h2>Midland Last Operator</h2>
-      <div id="midlandOperator" class="kpi loading">Loading...</div>
-    </div>
-
-    <div class="card">
-      <h2>Odessa Last Operator</h2>
-      <div id="odessaOperator" class="kpi loading">Loading...</div>
-    </div>
-  </div>
-
-  <div id="lastUpdated" class="muted">Waiting on live data...</div>
-
-  <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLScvZA6r7Nlp5y3KfMqB2SHBV5hKeRXVFVGz7s_RGkc0ioSWZg/viewform" target="_blank">CJT Tank Levels</a>
-  <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSdjyN2IfoZTlYmSfGk9GrTbvs-uX7JyBUjGpZTHQg7o4kjGMQ/viewform" target="_blank">Driver Pre Trip Inspection</a>
-  <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSe-bXzKUNqqX6doGBI2lDKWOBpI4zVyLcT2RWzi4ECenynpiQ/viewform" target="_blank">Driver Loader Tracker</a>
-  <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSeRBl8u1W-MkQWCsHBejOWgxugN30eF7VE1_VH4ASVaUgb0ng/viewform" target="_blank">Offload Log</a>
-  <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLScz3_nfZaCuZjce2TwjcqwgdXTabMn205amwdUyor3GXwuvqA/viewform" target="_blank">Oil Sales Report</a>
-  <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSfqmb4-FSJQlIILMDa2IqIhYwao8T1AtzqpHHoZVi4mZMDlGA/viewform" target="_blank">Centrifuge Health Log</a>
-  <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSfI_mcJyZ9qFtrJnaLN6tj3lT8KFqBgQ2Dn65C43DLyUPsi5Q/viewform" target="_blank">Decanter Flush Log</a>
-  <a class="btn" href="https://docs.google.com/spreadsheets/d/18F9w2pAFuSukRMoEHIF0bj6gyc8yPEKJh0udq2u0_yM/edit?gid=0#gid=0" target="_blank">Capacity Dashboard</a>
-
-  <div class="footer-note">CJT Live Operations Dashboard</div>
-
-</div>
-
 <script>
 const verses = [
 "Genesis 1:1 — In the beginning God created the heavens and the earth.",
@@ -471,8 +117,12 @@ function getDailyVerse() {
 document.getElementById("verseText").innerText = getDailyVerse();
 
 const sheetId = "18F9w2pAFuSukRMoEHIF0bj6gyc8yPEKJh0udq2u0_yM";
-const sheetName = "Capacity Dashboard";
-const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&tqx=out:json`;
+
+const capacityURL =
+  `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${encodeURIComponent("Capacity Dashboard")}&tqx=out:json`;
+
+const opsURL =
+  `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${encodeURIComponent("Centrifuge_Stats")}&tqx=out:json`;
 
 function cleanNumber(value) {
   if (value === null || value === undefined || value === "") return 0;
@@ -519,51 +169,83 @@ function setOilColor(el) {
   el.classList.add("blue");
 }
 
-function getValueAt(rows, rowIndex, colIndex) {
-  const row = rows[rowIndex];
-  if (!row || !row.c || !row.c[colIndex] || typeof row.c[colIndex].v === "undefined") return "";
+function parseGoogleSheet(text) {
+  return JSON.parse(text.substring(47).slice(0, -2)).table.rows;
+}
+
+function getCellValue(row, colIndex) {
+  if (!row || !row.c || !row.c[colIndex] || typeof row.c[colIndex].v === "undefined") {
+    return "";
+  }
   return row.c[colIndex].v;
 }
 
-fetch(url)
+// CAPACITY + OIL
+fetch(capacityURL)
   .then(res => res.text())
   .then(text => {
-    const json = JSON.parse(text.substring(47).slice(0, -2));
-    const rows = json.table.rows;
+    const rows = parseGoogleSheet(text);
 
-    // Main capacity block
-    const midlandOpen = cleanNumber(getValueAt(rows, 6, 1)); // B7
-    const odessaOpen = cleanNumber(getValueAt(rows, 6, 2));  // C7
+    const midlandOpen = cleanNumber(getCellValue(rows[6], 1));  // B7
+    const odessaOpen = cleanNumber(getCellValue(rows[6], 2));   // C7
 
-    // Oil block assumed layout:
-    // K3/L3 starting oil
-    // K4/L4 oil in
-    // K5/L5 oil sold
-    // K6/L6 net oil on yard
-    // K8 combined oil on yard
-    const midlandOil = cleanNumber(getValueAt(rows, 5, 10));   // K6
-    const odessaOil = cleanNumber(getValueAt(rows, 5, 11));    // L6
-    const combinedOil = cleanNumber(getValueAt(rows, 7, 10));  // K8
-
-    // Operations block assumed layout:
-    // O3/P3 processing
-    // O4/P4 downtime
-    // O5/P5 current status
-    // O6/P6 last operator
-    const midlandProc = cleanNumber(getValueAt(rows, 2, 14));     // O3
-    const odessaProc = cleanNumber(getValueAt(rows, 2, 15));      // P3
-    const midlandDown = cleanNumber(getValueAt(rows, 3, 14));     // O4
-    const odessaDown = cleanNumber(getValueAt(rows, 3, 15));      // P4
-    const midlandStatus = String(getValueAt(rows, 4, 14) || "Unknown");  // O5
-    const odessaStatus = String(getValueAt(rows, 4, 15) || "Unknown");   // P5
-    const midlandOperator = String(getValueAt(rows, 5, 14) || "Unknown"); // O6
-    const odessaOperator = String(getValueAt(rows, 5, 15) || "Unknown");  // P6
+    const midlandOil = cleanNumber(getCellValue(rows[5], 10));  // K6
+    const odessaOil = cleanNumber(getCellValue(rows[5], 11));   // L6
+    const combinedOil = cleanNumber(getCellValue(rows[7], 10)); // K8
 
     const midlandOpenEl = document.getElementById("midlandOpen");
     const odessaOpenEl = document.getElementById("odessaOpen");
     const midlandOilEl = document.getElementById("midlandOil");
     const odessaOilEl = document.getElementById("odessaOil");
     const combinedOilEl = document.getElementById("combinedOil");
+
+    midlandOpenEl.textContent = fmtBbl(midlandOpen);
+    odessaOpenEl.textContent = fmtBbl(odessaOpen);
+    midlandOilEl.textContent = fmtBbl(midlandOil);
+    odessaOilEl.textContent = fmtBbl(odessaOil);
+    combinedOilEl.textContent = fmtBbl(combinedOil);
+
+    setCapacityColor(midlandOpenEl, midlandOpen);
+    setCapacityColor(odessaOpenEl, odessaOpen);
+    setOilColor(midlandOilEl);
+    setOilColor(odessaOilEl);
+    setOilColor(combinedOilEl);
+  })
+  .catch(err => {
+    console.error("Capacity/Oil load error:", err);
+    [
+      "midlandOpen","odessaOpen","midlandOil","odessaOil","combinedOil"
+    ].forEach(id => {
+      document.getElementById(id).textContent = "Error";
+    });
+  });
+
+// OPERATIONS
+fetch(opsURL)
+  .then(res => res.text())
+  .then(text => {
+    const rows = parseGoogleSheet(text);
+
+    // Centrifuge_Stats summary block:
+    // row 0 = headers
+    // row 1 = Metric / Midland / Odessa
+    // row 2 = Processing Hours (24h)
+    // row 3 = Downtime Hours (24h)
+    // row 4 = Current Status
+    // row 5 = Last Operator
+
+    const midlandProc = cleanNumber(getCellValue(rows[2], 14));   // O3
+    const odessaProc = cleanNumber(getCellValue(rows[2], 15));    // P3
+
+    const midlandDown = cleanNumber(getCellValue(rows[3], 14));   // O4
+    const odessaDown = cleanNumber(getCellValue(rows[3], 15));    // P4
+
+    const midlandStatus = String(getCellValue(rows[4], 14) || "Unknown"); // O5
+    const odessaStatus = String(getCellValue(rows[4], 15) || "Unknown");  // P5
+
+    const midlandOperator = String(getCellValue(rows[5], 14) || "Unknown"); // O6
+    const odessaOperator = String(getCellValue(rows[5], 15) || "Unknown");  // P6
+
     const midlandProcEl = document.getElementById("midlandProc");
     const odessaProcEl = document.getElementById("odessaProc");
     const midlandDownEl = document.getElementById("midlandDown");
@@ -573,11 +255,6 @@ fetch(url)
     const midlandOperatorEl = document.getElementById("midlandOperator");
     const odessaOperatorEl = document.getElementById("odessaOperator");
 
-    midlandOpenEl.textContent = fmtBbl(midlandOpen);
-    odessaOpenEl.textContent = fmtBbl(odessaOpen);
-    midlandOilEl.textContent = fmtBbl(midlandOil);
-    odessaOilEl.textContent = fmtBbl(odessaOil);
-    combinedOilEl.textContent = fmtBbl(combinedOil);
     midlandProcEl.textContent = fmtHours(midlandProc);
     odessaProcEl.textContent = fmtHours(odessaProc);
     midlandDownEl.textContent = fmtHours(midlandDown);
@@ -587,42 +264,24 @@ fetch(url)
     midlandOperatorEl.textContent = midlandOperator;
     odessaOperatorEl.textContent = odessaOperator;
 
-    setCapacityColor(midlandOpenEl, midlandOpen);
-    setCapacityColor(odessaOpenEl, odessaOpen);
-    setOilColor(midlandOilEl);
-    setOilColor(odessaOilEl);
-    setOilColor(combinedOilEl);
     setStatusColor(midlandStatusEl, midlandStatus);
     setStatusColor(odessaStatusEl, odessaStatus);
-
-    [
-      midlandOilEl, odessaOilEl, combinedOilEl,
-      midlandProcEl, odessaProcEl,
-      midlandDownEl, odessaDownEl,
-      midlandOperatorEl, odessaOperatorEl
-    ].forEach(el => el.classList.remove("loading"));
-
-    document.getElementById("lastUpdated").textContent =
-      `Last updated: ${new Date().toLocaleString()}`;
   })
   .catch(err => {
-    console.error("Dashboard load error:", err);
+    console.error("Operations load error:", err);
     [
-      "midlandOpen","odessaOpen","midlandOil","odessaOil","combinedOil",
       "midlandProc","odessaProc","midlandDown","odessaDown",
       "midlandStatus","odessaStatus","midlandOperator","odessaOperator"
     ].forEach(id => {
       document.getElementById(id).textContent = "Error";
     });
-
+  })
+  .finally(() => {
     document.getElementById("lastUpdated").textContent =
-      "Could not load live sheet data. Make sure the Capacity Dashboard sheet is shared as Anyone with the link → Viewer.";
+      `Last updated: ${new Date().toLocaleString()}`;
   });
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js");
 }
 </script>
-
-</body>
-</html>
