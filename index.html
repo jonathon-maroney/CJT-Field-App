@@ -471,11 +471,8 @@ document.getElementById("verseText").innerText = getDailyVerse();
 
 const sheetId = "18F9w2pAFuSukRMoEHIF0bj6gyc8yPEKJh0udq2u0_yM";
 
-const capacityURL =
-  `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${encodeURIComponent("Capacity Dashboard")}&tqx=out:json`;
-
-const opsURL =
-  `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${encodeURIComponent("Centrifuge_Stats")}&tqx=out:json`;
+const capacityURL = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${encodeURIComponent("Capacity Dashboard")}&tqx=out:json`;
+const opsURL = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${encodeURIComponent("Centrifuge_Stats")}&tqx=out:json`;
 
 function cleanNumber(value) {
   if (value === null || value === undefined || value === "") return 0;
@@ -533,6 +530,23 @@ function getCellValue(row, colIndex) {
   return row.c[colIndex].v;
 }
 
+function findMetricRow(rows, metricName) {
+  for (const row of rows) {
+    if (!row || !row.c) continue;
+
+    for (let i = 0; i < row.c.length; i++) {
+      const val = row.c[i] && typeof row.c[i].v !== "undefined" ? String(row.c[i].v).trim() : "";
+      if (val === metricName) {
+        return {
+          midland: row.c[i + 1] && typeof row.c[i + 1].v !== "undefined" ? row.c[i + 1].v : "",
+          odessa: row.c[i + 2] && typeof row.c[i + 2].v !== "undefined" ? row.c[i + 2].v : ""
+        };
+      }
+    }
+  }
+  return { midland: "", odessa: "" };
+}
+
 // CAPACITY + OIL
 fetch(capacityURL)
   .then(res => res.text())
@@ -579,17 +593,22 @@ fetch(opsURL)
   .then(text => {
     const rows = parseGoogleSheet(text);
 
-    const midlandProc = cleanNumber(getCellValue(rows[2], 14));   // O3
-    const odessaProc = cleanNumber(getCellValue(rows[2], 15));    // P3
+    const proc = findMetricRow(rows, "Processing Hours (24h)");
+    const down = findMetricRow(rows, "Downtime Hours (24h)");
+    const status = findMetricRow(rows, "Current Status");
+    const operator = findMetricRow(rows, "Last Operator");
 
-    const midlandDown = cleanNumber(getCellValue(rows[3], 14));   // O4
-    const odessaDown = cleanNumber(getCellValue(rows[3], 15));    // P4
+    const midlandProc = cleanNumber(proc.midland);
+    const odessaProc = cleanNumber(proc.odessa);
 
-    const midlandStatus = String(getCellValue(rows[4], 14) || "Unknown"); // O5
-    const odessaStatus = String(getCellValue(rows[4], 15) || "Unknown");  // P5
+    const midlandDown = cleanNumber(down.midland);
+    const odessaDown = cleanNumber(down.odessa);
 
-    const midlandOperator = String(getCellValue(rows[5], 14) || "Unknown"); // O6
-    const odessaOperator = String(getCellValue(rows[5], 15) || "Unknown");  // P6
+    const midlandStatus = String(status.midland || "Unknown");
+    const odessaStatus = String(status.odessa || "Unknown");
+
+    const midlandOperator = String(operator.midland || "Unknown");
+    const odessaOperator = String(operator.odessa || "Unknown");
 
     const midlandProcEl = document.getElementById("midlandProc");
     const odessaProcEl = document.getElementById("odessaProc");
