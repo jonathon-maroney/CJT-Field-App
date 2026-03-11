@@ -509,7 +509,7 @@
     </div>
   </div>
 
-  <script>
+<script>
 const verses = [
 "Genesis 1:1 — In the beginning God created the heavens and the earth.",
 "Genesis 50:20 — What you meant for evil, God meant for good.",
@@ -620,7 +620,7 @@ const verses = [
 
 
     function getDailyVerse() {
-      const start = new Date("2026-01-01T00:00:00");
+      const start = new Date("2026-01-01");
       const now = new Date();
       const diff = Math.floor((now - start) / (1000 * 60 * 60 * 24));
       return verses[Math.abs(diff) % verses.length];
@@ -660,10 +660,10 @@ const verses = [
 
     function toInputDateValue(date) {
       if (!(date instanceof Date) || isNaN(date.getTime())) return "";
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const day = String(date.getDate()).padStart(2, "0");
-      return `${year}-${month}-${day}`;
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
     }
 
     function atStartOfDay(date) {
@@ -682,15 +682,17 @@ const verses = [
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      const end = new Date(today);
-      end.setDate(today.getDate() - ((today.getDay() + 1) % 7));
+      const lastSaturday = new Date(today);
+      const day = today.getDay();
+      const daysBackToSaturday = day === 6 ? 7 : (day + 1);
+      lastSaturday.setDate(today.getDate() - daysBackToSaturday);
 
-      const start = new Date(end);
-      start.setDate(end.getDate() - 6);
+      const sunday = new Date(lastSaturday);
+      sunday.setDate(lastSaturday.getDate() - 6);
 
       return {
-        start: atStartOfDay(start),
-        end: atEndOfDay(end)
+        start: atStartOfDay(sunday),
+        end: atEndOfDay(lastSaturday)
       };
     }
 
@@ -712,34 +714,25 @@ const verses = [
       else el.classList.add("status-other");
     }
 
-    function setOilColor(el, colorClass = "blue") {
+    function setOilColor(el, colorClass) {
       el.classList.remove("green", "yellow", "red", "blue", "purple", "loading");
-      el.classList.add(colorClass);
+      el.classList.add(colorClass || "blue");
     }
 
     function parseGoogleSheet(text) {
-      const jsonText = text
-        .substring(47)
-        .slice(0, -2)
-        .replace(/Date\((\d+),(\d+),(\d+)(?:,(\d+),(\d+),(\d+))?\)/g, '"Date($1,$2,$3,$4,$5,$6)"');
-
-      return JSON.parse(jsonText).table.rows;
-    }
-
-    function getCell(row, colIndex) {
-      if (!row || !row.c || !row.c[colIndex]) return null;
-      return row.c[colIndex];
+      return JSON.parse(text.substring(47).slice(0, -2)).table.rows;
     }
 
     function getCellValue(row, colIndex) {
-      const cell = getCell(row, colIndex);
-      if (!cell || typeof cell.v === "undefined" || cell.v === null) return "";
-      return cell.v;
+      if (!row || !row.c || !row.c[colIndex] || typeof row.c[colIndex].v === "undefined") {
+        return "";
+      }
+      return row.c[colIndex].v;
     }
 
     function getCellDisplayValue(row, colIndex) {
-      const cell = getCell(row, colIndex);
-      if (!cell) return "";
+      if (!row || !row.c || !row.c[colIndex]) return "";
+      const cell = row.c[colIndex];
       if (typeof cell.f !== "undefined" && cell.f !== null && cell.f !== "") return String(cell.f);
       if (typeof cell.v !== "undefined" && cell.v !== null) return String(cell.v);
       return "";
@@ -762,38 +755,14 @@ const verses = [
       return { midland: "", odessa: "" };
     }
 
-    function parseSheetDate(rawValue, fallbackDisplay = "") {
-      if (rawValue instanceof Date && !isNaN(rawValue.getTime())) {
-        return atStartOfDay(rawValue);
+    function parseSheetDate(value) {
+      if (value instanceof Date && !isNaN(value.getTime())) {
+        return atStartOfDay(value);
       }
-
-      if (typeof rawValue === "string") {
-        const trimmed = rawValue.trim();
-
-        const gvizMatch = trimmed.match(/^Date\((\d+),(\d+),(\d+)(?:,(\d+),(\d+),(\d+))?\)$/);
-        if (gvizMatch) {
-          const year = Number(gvizMatch[1]);
-          const month = Number(gvizMatch[2]);
-          const day = Number(gvizMatch[3]);
-          const hour = Number(gvizMatch[4] || 0);
-          const minute = Number(gvizMatch[5] || 0);
-          const second = Number(gvizMatch[6] || 0);
-          return new Date(year, month, day, hour, minute, second);
-        }
-
-        const parsed = new Date(trimmed);
-        if (!isNaN(parsed.getTime())) {
-          return atStartOfDay(parsed);
-        }
+      if (typeof value === "string" && value.trim()) {
+        const parsed = new Date(value);
+        if (!isNaN(parsed.getTime())) return atStartOfDay(parsed);
       }
-
-      if (fallbackDisplay) {
-        const parsedFallback = new Date(fallbackDisplay);
-        if (!isNaN(parsedFallback.getTime())) {
-          return atStartOfDay(parsedFallback);
-        }
-      }
-
       return null;
     }
 
@@ -802,56 +771,15 @@ const verses = [
       if (!raw) return "Unknown";
 
       const upper = raw.toUpperCase();
-
       if (upper.includes("MIDLAND")) return "Midland";
       if (upper.includes("ODESSA")) return "Odessa";
 
-      return raw
-        .toLowerCase()
-        .replace(/\b\w/g, chr => chr.toUpperCase());
+      return raw;
     }
-
-    function loadOilSalesData(rows) {
-      const records = [];
-
-      for (let i = 1; i < rows.length; i++) {
-        const row = rows[i];
-        if (!row || !row.c) continue;
-
-        const rawDate = getCellValue(row, 2);       // C
-        const dateDisplay = getCellDisplayValue(row, 2);
-        const ticket = getCellDisplayValue(row, 4); // E
-        const pickupLease = getCellDisplayValue(row, 5); // F
-        const bblTotal = cleanNumber(getCellValue(row, 10)); // K
-
-        const saleDate = parseSheetDate(rawDate, dateDisplay);
-        const facility = normalizeFacilityName(pickupLease);
-
-        if (!saleDate || !ticket || !pickupLease || bblTotal <= 0) continue;
-
-        records.push({
-          saleDate,
-          saleDateText: fmtDate(saleDate),
-          ticket: String(ticket).trim(),
-          pickupLease: String(pickupLease).trim(),
-          facility,
-          bblTotal
-        });
-      }
-
-      oilSalesRecords = records;
-      renderWeeklySalesCards();
-      setDefaultLookupDates();
-      runDateRangeLookup();
-    }
-
     function getSalesInRange(startDate, endDate) {
       const start = atStartOfDay(startDate);
       const end = atEndOfDay(endDate);
-
-      return oilSalesRecords.filter(record => {
-        return record.saleDate >= start && record.saleDate <= end;
-      });
+      return oilSalesRecords.filter(r => r.saleDate >= start && r.saleDate <= end);
     }
 
     function summarizeSales(records) {
@@ -874,12 +802,10 @@ const verses = [
         totalTickets += 1;
       });
 
-      const facilityList = Object.values(byFacility).sort((a, b) => b.totalBbl - a.totalBbl);
-
       return {
         totalBbl,
         totalTickets,
-        facilityList
+        facilityList: Object.values(byFacility).sort((a, b) => b.totalBbl - a.totalBbl)
       };
     }
 
@@ -888,27 +814,22 @@ const verses = [
       const records = getSalesInRange(range.start, range.end);
       const summary = summarizeSales(records);
 
-      const midland = summary.facilityList.find(item => item.facility === "Midland");
-      const odessa = summary.facilityList.find(item => item.facility === "Odessa");
+      const midland = summary.facilityList.find(x => x.facility === "Midland");
+      const odessa = summary.facilityList.find(x => x.facility === "Odessa");
 
-      const midlandValue = midland ? midland.totalBbl : 0;
-      const odessaValue = odessa ? odessa.totalBbl : 0;
-      const combinedValue = summary.totalBbl;
+      const midlandVal = midland ? midland.totalBbl : 0;
+      const odessaVal = odessa ? odessa.totalBbl : 0;
+      const combinedVal = summary.totalBbl;
+
+      document.getElementById("midlandSales7").textContent = fmtBbl(midlandVal);
+      document.getElementById("odessaSales7").textContent = fmtBbl(odessaVal);
+      document.getElementById("combinedSales7").textContent = fmtBbl(combinedVal);
+
+      setOilColor(document.getElementById("midlandSales7"), "purple");
+      setOilColor(document.getElementById("odessaSales7"), "purple");
+      setOilColor(document.getElementById("combinedSales7"), "purple");
 
       const rangeText = `${fmtDate(range.start)} - ${fmtDate(range.end)}`;
-
-      const midlandEl = document.getElementById("midlandSales7");
-      const odessaEl = document.getElementById("odessaSales7");
-      const combinedEl = document.getElementById("combinedSales7");
-
-      midlandEl.textContent = fmtBbl(midlandValue);
-      odessaEl.textContent = fmtBbl(odessaValue);
-      combinedEl.textContent = fmtBbl(combinedValue);
-
-      setOilColor(midlandEl, "purple");
-      setOilColor(odessaEl, "purple");
-      setOilColor(combinedEl, "purple");
-
       document.getElementById("midlandSales7Sub").textContent = `${rangeText} • ${midland ? midland.tickets : 0} tickets`;
       document.getElementById("odessaSales7Sub").textContent = `${rangeText} • ${odessa ? odessa.tickets : 0} tickets`;
       document.getElementById("combinedSales7Sub").textContent = `${rangeText} • ${summary.totalTickets} tickets`;
@@ -921,7 +842,7 @@ const verses = [
     }
 
     function renderLookupSummary(summary, startDate, endDate) {
-      const html = `
+      document.getElementById("lookupSummary").innerHTML = `
         <div class="mini-card">
           <div class="mini-label">Date Range</div>
           <div class="mini-value">${fmtDate(startDate)} - ${fmtDate(endDate)}</div>
@@ -935,7 +856,6 @@ const verses = [
           <div class="mini-value">${summary.totalTickets.toLocaleString()}</div>
         </div>
       `;
-      document.getElementById("lookupSummary").innerHTML = html;
     }
 
     function renderFacilityTotals(summary) {
@@ -967,9 +887,7 @@ const verses = [
                 <th>Tickets</th>
               </tr>
             </thead>
-            <tbody>
-              ${rowsHtml}
-            </tbody>
+            <tbody>${rowsHtml}</tbody>
           </table>
         </div>
       `;
@@ -1010,9 +928,7 @@ const verses = [
                 <th>BBL Total</th>
               </tr>
             </thead>
-            <tbody>
-              ${rowsHtml}
-            </tbody>
+            <tbody>${rowsHtml}</tbody>
           </table>
         </div>
       `;
@@ -1021,13 +937,9 @@ const verses = [
     function runDateRangeLookup() {
       const fromValue = document.getElementById("fromDate").value;
       const toValue = document.getElementById("toDate").value;
-      const lookupMeta = document.getElementById("lookupMeta");
 
       if (!fromValue || !toValue) {
-        lookupMeta.textContent = "Choose both dates first.";
-        document.getElementById("lookupSummary").innerHTML = "";
-        document.getElementById("facilityTotalsWrap").innerHTML = `<div class="empty-state">Choose a valid date range.</div>`;
-        document.getElementById("ticketDetailsWrap").innerHTML = `<div class="empty-state">Choose a valid date range.</div>`;
+        document.getElementById("lookupMeta").textContent = "Choose both dates first.";
         return;
       }
 
@@ -1035,17 +947,15 @@ const verses = [
       const endDate = atEndOfDay(new Date(toValue + "T00:00:00"));
 
       if (startDate > endDate) {
-        lookupMeta.textContent = "From Date cannot be after To Date.";
-        document.getElementById("lookupSummary").innerHTML = "";
-        document.getElementById("facilityTotalsWrap").innerHTML = `<div class="empty-state">Fix the date range and run it again.</div>`;
-        document.getElementById("ticketDetailsWrap").innerHTML = `<div class="empty-state">Fix the date range and run it again.</div>`;
+        document.getElementById("lookupMeta").textContent = "From Date cannot be after To Date.";
         return;
       }
 
       const records = getSalesInRange(startDate, endDate);
       const summary = summarizeSales(records);
 
-      lookupMeta.textContent = `Showing oil sales from ${fmtDate(startDate)} through ${fmtDate(endDate)}.`;
+      document.getElementById("lookupMeta").textContent =
+        `Showing oil sales from ${fmtDate(startDate)} through ${fmtDate(endDate)}.`;
 
       renderLookupSummary(summary, startDate, endDate);
       renderFacilityTotals(summary);
@@ -1075,7 +985,6 @@ const verses = [
     document.getElementById("salesTab").addEventListener("click", () => showView("sales"));
     document.getElementById("runLookupBtn").addEventListener("click", runDateRangeLookup);
 
-    // Capacity + Oil
     fetch(capacityURL)
       .then(res => res.text())
       .then(text => {
@@ -1102,9 +1011,9 @@ const verses = [
 
         setCapacityColor(midlandOpenEl, midlandOpen);
         setCapacityColor(odessaOpenEl, odessaOpen);
-        setOilColor(midlandOilEl);
-        setOilColor(odessaOilEl);
-        setOilColor(combinedOilEl);
+        setOilColor(midlandOilEl, "blue");
+        setOilColor(odessaOilEl, "blue");
+        setOilColor(combinedOilEl, "blue");
       })
       .catch(err => {
         console.error("Capacity/Oil load error:", err);
@@ -1113,7 +1022,6 @@ const verses = [
         });
       });
 
-    // Operations
     fetch(opsURL)
       .then(res => res.text())
       .then(text => {
@@ -1164,21 +1072,41 @@ const verses = [
         });
       });
 
-    // Oil Sales Data
     fetch(oilSalesURL)
       .then(res => res.text())
       .then(text => {
         const rows = parseGoogleSheet(text);
-        loadOilSalesData(rows);
+        const records = [];
+
+        for (let i = 1; i < rows.length; i++) {
+          const row = rows[i];
+          const saleDate = parseSheetDate(getCellValue(row, 2));
+          const ticket = getCellDisplayValue(row, 4);
+          const pickupLease = getCellDisplayValue(row, 5);
+          const bblTotal = cleanNumber(getCellValue(row, 10));
+
+          if (!saleDate || !ticket || !pickupLease || bblTotal <= 0) continue;
+
+          records.push({
+            saleDate,
+            saleDateText: fmtDate(saleDate),
+            ticket: String(ticket).trim(),
+            pickupLease: String(pickupLease).trim(),
+            facility: normalizeFacilityName(pickupLease),
+            bblTotal
+          });
+        }
+
+        oilSalesRecords = records;
+        renderWeeklySalesCards();
+        setDefaultLookupDates();
+        runDateRangeLookup();
       })
       .catch(err => {
         console.error("Oil sales load error:", err);
-
-        ["midlandSales7","odessaSales7","combinedSales7"].forEach(id => {
-          document.getElementById(id).textContent = "Error";
-        });
-
-        document.getElementById("lookupMeta").textContent = "Could not load OilSales_Data.";
+        document.getElementById("midlandSales7").textContent = "Error";
+        document.getElementById("odessaSales7").textContent = "Error";
+        document.getElementById("combinedSales7").textContent = "Error";
         document.getElementById("facilityTotalsWrap").innerHTML = `<div class="empty-state">Oil sales data failed to load.</div>`;
         document.getElementById("ticketDetailsWrap").innerHTML = `<div class="empty-state">Oil sales data failed to load.</div>`;
       })
