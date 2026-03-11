@@ -6,34 +6,103 @@
 <title>CJT Field App</title>
 
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#111111">
+<meta name="theme-color" content="#0f172a">
 
 <style>
+:root{
+  --bg1:#0b1220;
+  --bg2:#111827;
+  --card:rgba(255,255,255,.08);
+  --card-border:rgba(255,255,255,.10);
+  --text:#f8fafc;
+  --muted:#cbd5e1;
+  --green:#22c55e;
+  --yellow:#eab308;
+  --red:#ef4444;
+  --accent:#2563eb;
+}
+
+*{
+  box-sizing:border-box;
+}
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: #f4f4f4;
-  color: #111;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(37,99,235,.16), transparent 35%),
+    radial-gradient(circle at top right, rgba(34,197,94,.12), transparent 30%),
+    linear-gradient(160deg, var(--bg1), var(--bg2));
+  min-height: 100vh;
 }
 
 header {
-  background: #111;
+  background: rgba(0,0,0,.28);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255,255,255,.08);
   color: white;
-  padding: 18px;
-  font-size: 20px;
-  font-weight: 700;
+  padding: 18px 16px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: .3px;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 20;
 }
 
 .wrap {
   padding: 16px;
   display: grid;
   gap: 14px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.verse-box{
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 18px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0,0,0,.20);
+  backdrop-filter: blur(8px);
+}
+
+.verse-label{
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #93c5fd;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.verse-text{
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text);
+  opacity: 0;
+  animation: fadeVerse 1.2s ease forwards;
+}
+
+@keyframes fadeVerse{
+  from{
+    opacity:0;
+    transform: translateY(10px);
+  }
+  to{
+    opacity:1;
+    transform: translateY(0);
+  }
 }
 
 .section-title {
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 800;
   margin: 6px 0 2px;
+  color: #e2e8f0;
 }
 
 .capacity-grid {
@@ -42,76 +111,89 @@ header {
   gap: 12px;
 }
 
-.movement-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
+.card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  padding: 20px;
+  border-radius: 18px;
+  box-shadow: 0 10px 28px rgba(0,0,0,.22);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
 }
 
-.card {
-  background: white;
-  padding: 18px;
-  border-radius: 14px;
-  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+.card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: linear-gradient(135deg, rgba(255,255,255,.08), transparent 40%);
+  pointer-events:none;
 }
 
 .card h2 {
-  margin: 0 0 8px;
+  margin: 0 0 10px;
   font-size: 16px;
-  color: #444;
+  color: var(--muted);
 }
 
 .big-number {
-  font-size: 34px;
-  font-weight: 800;
-  line-height: 1.1;
-}
-
-.kpi {
-  font-size: 28px;
-  font-weight: 700;
-  line-height: 1.1;
+  font-size: 38px;
+  font-weight: 900;
+  line-height: 1.05;
+  margin-bottom: 8px;
 }
 
 .sub {
   margin-top: 8px;
   font-size: 13px;
-  color: #666;
+  color: var(--muted);
 }
 
-.green { color: #16a34a; }
-.yellow { color: #ca8a04; }
-.red { color: #dc2626; }
+.green { color: var(--green); }
+.yellow { color: var(--yellow); }
+.red { color: var(--red); }
 .loading { opacity: 0.65; }
 
 a.btn {
   display: block;
-  background: white;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.10);
   padding: 18px;
-  border-radius: 14px;
+  border-radius: 16px;
   text-decoration: none;
-  color: #111;
-  font-weight: 700;
-  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+  color: var(--text);
+  font-weight: 800;
+  box-shadow: 0 8px 22px rgba(0,0,0,.18);
+  backdrop-filter: blur(8px);
+  transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
 }
 
 a.btn:hover {
-  background: #eaeaea;
+  background: rgba(255,255,255,.12);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(0,0,0,.24);
+}
+
+a.btn:active{
+  transform: translateY(0);
 }
 
 .muted {
   font-size: 12px;
-  color: #666;
+  color: var(--muted);
   text-align: center;
   margin-top: 2px;
 }
 
+.footer-note{
+  text-align:center;
+  font-size:12px;
+  color:#94a3b8;
+  padding: 6px 0 12px;
+}
+
 @media (min-width: 700px) {
   .capacity-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .movement-grid {
     grid-template-columns: 1fr 1fr;
   }
 }
@@ -122,6 +204,11 @@ a.btn:hover {
 <header>CJT Field App</header>
 
 <div class="wrap">
+
+  <div class="verse-box">
+    <div class="verse-label">Daily Verse</div>
+    <div id="verseText" class="verse-text">Loading verse...</div>
+  </div>
 
   <div class="section-title">Live Capacity</div>
 
@@ -136,40 +223,6 @@ a.btn:hover {
       <h2>Odessa Open Space</h2>
       <div id="odessaOpen" class="big-number loading">Loading...</div>
       <div class="sub">Live from Capacity Dashboard</div>
-    </div>
-  </div>
-
-  <div class="section-title">Today’s Movement</div>
-
-  <div class="movement-grid">
-    <div class="card">
-      <h2>Midland Loads In</h2>
-      <div id="midlandIn" class="kpi loading">Loading...</div>
-    </div>
-
-    <div class="card">
-      <h2>Midland Loads Out</h2>
-      <div id="midlandOut" class="kpi loading">Loading...</div>
-    </div>
-
-    <div class="card">
-      <h2>Odessa Loads In</h2>
-      <div id="odessaIn" class="kpi loading">Loading...</div>
-    </div>
-
-    <div class="card">
-      <h2>Odessa Loads Out</h2>
-      <div id="odessaOut" class="kpi loading">Loading...</div>
-    </div>
-
-    <div class="card">
-      <h2>Midland Net Change</h2>
-      <div id="midlandNet" class="kpi loading">Loading...</div>
-    </div>
-
-    <div class="card">
-      <h2>Odessa Net Change</h2>
-      <div id="odessaNet" class="kpi loading">Loading...</div>
     </div>
   </div>
 
@@ -191,9 +244,128 @@ a.btn:hover {
 
   <a class="btn" href="https://docs.google.com/spreadsheets/d/18F9w2pAFuSukRMoEHIF0bj6gyc8yPEKJh0udq2u0_yM/edit?gid=0#gid=0" target="_blank">Capacity Dashboard</a>
 
+  <div class="footer-note">CJT Live Operations Dashboard</div>
+
 </div>
 
 <script>
+const verses = [
+"Genesis 1:1 — In the beginning God created the heavens and the earth.",
+"Genesis 50:20 — What you meant for evil, God meant for good.",
+"Exodus 14:14 — The Lord will fight for you; you need only to be still.",
+"Deuteronomy 31:6 — Be strong and courageous. Do not fear.",
+"Joshua 1:9 — Be strong and courageous. The Lord your God is with you.",
+"1 Samuel 16:7 — The Lord looks at the heart.",
+"2 Samuel 22:31 — God’s way is perfect.",
+"1 Kings 8:57 — May the Lord our God be with us.",
+"2 Chronicles 7:14 — If my people humble themselves and pray.",
+"Nehemiah 8:10 — The joy of the Lord is your strength.",
+"Job 19:25 — I know that my Redeemer lives.",
+"Psalm 1:1 — Blessed is the one who does not walk in step with the wicked.",
+"Psalm 18:2 — The Lord is my rock and my fortress.",
+"Psalm 23:1 — The Lord is my shepherd; I shall not want.",
+"Psalm 27:1 — The Lord is my light and my salvation.",
+"Psalm 34:8 — Taste and see that the Lord is good.",
+"Psalm 37:4 — Delight yourself in the Lord.",
+"Psalm 46:1 — God is our refuge and strength.",
+"Psalm 55:22 — Cast your cares on the Lord.",
+"Psalm 56:3 — When I am afraid, I put my trust in you.",
+"Psalm 62:6 — He alone is my rock and salvation.",
+"Psalm 73:26 — God is the strength of my heart.",
+"Psalm 91:2 — My refuge and my fortress.",
+"Psalm 100:5 — The Lord is good and his love endures forever.",
+"Psalm 118:24 — This is the day the Lord has made.",
+"Proverbs 3:5 — Trust in the Lord with all your heart.",
+"Proverbs 16:3 — Commit your work to the Lord.",
+"Proverbs 18:10 — The name of the Lord is a strong tower.",
+"Isaiah 26:3 — You will keep in perfect peace.",
+"Isaiah 40:31 — Those who hope in the Lord renew their strength.",
+"Isaiah 41:10 — Fear not, for I am with you.",
+"Isaiah 43:2 — When you pass through waters, I will be with you.",
+"Isaiah 54:17 — No weapon formed against you shall prosper.",
+"Jeremiah 29:11 — I know the plans I have for you.",
+"Lamentations 3:22 — His mercies are new every morning.",
+"Ezekiel 36:26 — I will give you a new heart.",
+"Daniel 2:20 — Wisdom and power belong to God.",
+"Joel 2:25 — I will restore the years the locusts have eaten.",
+"Micah 6:8 — Act justly, love mercy, walk humbly.",
+"Zephaniah 3:17 — The Lord rejoices over you.",
+"Matthew 5:16 — Let your light shine before others.",
+"Matthew 6:33 — Seek first the kingdom of God.",
+"Matthew 7:7 — Ask and it will be given to you.",
+"Matthew 11:28 — Come to me all who are weary.",
+"Matthew 19:26 — With God all things are possible.",
+"Matthew 22:37 — Love the Lord your God.",
+"Mark 10:27 — All things are possible with God.",
+"Luke 1:37 — Nothing is impossible with God.",
+"Luke 6:31 — Do to others as you would have them do to you.",
+"John 1:5 — The light shines in the darkness.",
+"John 3:16 — For God so loved the world.",
+"John 8:12 — I am the light of the world.",
+"John 10:10 — I have come that they may have life.",
+"John 11:25 — I am the resurrection and the life.",
+"John 13:34 — Love one another.",
+"John 14:6 — I am the way, the truth, and the life.",
+"John 15:5 — Apart from me you can do nothing.",
+"Acts 1:8 — You will receive power.",
+"Romans 5:8 — God demonstrates his love for us.",
+"Romans 8:28 — God works all things for good.",
+"Romans 8:31 — If God is for us who can be against us.",
+"Romans 12:2 — Be transformed by the renewing of your mind.",
+"1 Corinthians 10:13 — God will provide a way out.",
+"1 Corinthians 13:13 — Faith, hope, and love remain.",
+"2 Corinthians 5:7 — Walk by faith, not by sight.",
+"2 Corinthians 12:9 — My grace is sufficient for you.",
+"Galatians 5:22 — The fruit of the Spirit is love.",
+"Ephesians 2:8 — By grace you have been saved.",
+"Ephesians 3:20 — God can do immeasurably more.",
+"Ephesians 6:10 — Be strong in the Lord.",
+"Philippians 1:6 — He who began a good work will finish it.",
+"Philippians 4:6 — Do not be anxious about anything.",
+"Philippians 4:13 — I can do all things through Christ.",
+"Colossians 3:23 — Work heartily as for the Lord.",
+"1 Thessalonians 5:16 — Rejoice always.",
+"1 Thessalonians 5:17 — Pray continually.",
+"2 Thessalonians 3:3 — The Lord is faithful.",
+"1 Timothy 6:12 — Fight the good fight of faith.",
+"2 Timothy 1:7 — God gave us power, love, and self-control.",
+"Titus 2:11 — The grace of God has appeared.",
+"Hebrews 4:16 — Approach God’s throne with confidence.",
+"Hebrews 11:1 — Faith is confidence in what we hope for.",
+"Hebrews 13:8 — Jesus Christ is the same yesterday and today.",
+"James 1:5 — Ask God for wisdom.",
+"James 1:12 — Blessed is the one who perseveres.",
+"1 Peter 5:7 — Cast all your anxiety on Him.",
+"2 Peter 3:9 — The Lord is patient.",
+"1 John 4:8 — God is love.",
+"1 John 4:19 — We love because He first loved us.",
+"Jude 1:24 — He is able to keep you from falling.",
+"Revelation 3:20 — I stand at the door and knock.",
+"Revelation 21:4 — He will wipe every tear away.",
+"Psalm 19:14 — Let the words of my mouth and the meditation of my heart be pleasing to you.",
+"Psalm 121:1 — I lift up my eyes to the hills. My help comes from the Lord.",
+"Isaiah 30:21 — This is the way; walk in it.",
+"Jeremiah 33:3 — Call to me and I will answer you.",
+"John 16:33 — Take heart; I have overcome the world.",
+"Romans 15:13 — May the God of hope fill you with all joy and peace.",
+"1 Corinthians 16:13 — Be on your guard; stand firm in the faith; be courageous; be strong.",
+"Galatians 6:9 — Let us not grow weary of doing good.",
+"Ephesians 4:32 — Be kind and compassionate to one another.",
+"Colossians 3:2 — Set your minds on things above.",
+"Hebrews 12:1 — Let us run with perseverance the race marked out for us.",
+"James 4:8 — Draw near to God and He will draw near to you.",
+"1 John 5:14 — If we ask anything according to His will, He hears us."
+];
+
+function getDailyVerse() {
+  const start = new Date("2026-01-01");
+  const now = new Date();
+  const diff = Math.floor((now - start) / (1000 * 60 * 60 * 24));
+  return verses[Math.abs(diff) % verses.length];
+}
+
+document.getElementById("verseText").innerText = getDailyVerse();
+
 const sheetId = "18F9w2pAFuSukRMoEHIF0bj6gyc8yPEKJh0udq2u0_yM";
 const sheetName = "Capacity Dashboard";
 const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&tqx=out:json`;
@@ -221,19 +393,6 @@ function setCapacityColor(el, value) {
   }
 }
 
-function setNetColor(el, value) {
-  el.classList.remove("green", "yellow", "red", "loading");
-  const v = cleanNumber(value);
-
-  if (v > 0) {
-    el.classList.add("yellow");
-  } else if (v < 0) {
-    el.classList.add("green");
-  } else {
-    el.classList.add("red");
-  }
-}
-
 function getCellValue(cell) {
   return cell && typeof cell.v !== "undefined" ? cell.v : 0;
 }
@@ -244,10 +403,6 @@ fetch(url)
     const json = JSON.parse(text.substring(47).slice(0, -2));
     const rows = json.table.rows;
 
-    let midlandIn = 0;
-    let odessaIn = 0;
-    let midlandOut = 0;
-    let odessaOut = 0;
     let midlandOpen = 0;
     let odessaOpen = 0;
 
@@ -256,52 +411,20 @@ fetch(url)
       const midlandVal = getCellValue(row.c[1]);
       const odessaVal = getCellValue(row.c[2]);
 
-      if (label === "Loads In") {
-        midlandIn = cleanNumber(midlandVal);
-        odessaIn = cleanNumber(odessaVal);
-      }
-
-      if (label === "Loads Out") {
-        midlandOut = cleanNumber(midlandVal);
-        odessaOut = cleanNumber(odessaVal);
-      }
-
       if (label === "Available Capacity") {
         midlandOpen = cleanNumber(midlandVal);
         odessaOpen = cleanNumber(odessaVal);
       }
     });
 
-    const midlandNet = midlandIn - midlandOut;
-    const odessaNet = odessaIn - odessaOut;
-
     const midlandOpenEl = document.getElementById("midlandOpen");
     const odessaOpenEl = document.getElementById("odessaOpen");
-    const midlandInEl = document.getElementById("midlandIn");
-    const odessaInEl = document.getElementById("odessaIn");
-    const midlandOutEl = document.getElementById("midlandOut");
-    const odessaOutEl = document.getElementById("odessaOut");
-    const midlandNetEl = document.getElementById("midlandNet");
-    const odessaNetEl = document.getElementById("odessaNet");
 
     midlandOpenEl.textContent = fmtBbl(midlandOpen);
     odessaOpenEl.textContent = fmtBbl(odessaOpen);
-    midlandInEl.textContent = fmtBbl(midlandIn);
-    odessaInEl.textContent = fmtBbl(odessaIn);
-    midlandOutEl.textContent = fmtBbl(midlandOut);
-    odessaOutEl.textContent = fmtBbl(odessaOut);
-    midlandNetEl.textContent = fmtBbl(midlandNet);
-    odessaNetEl.textContent = fmtBbl(odessaNet);
 
     setCapacityColor(midlandOpenEl, midlandOpen);
     setCapacityColor(odessaOpenEl, odessaOpen);
-    setNetColor(midlandNetEl, midlandNet);
-    setNetColor(odessaNetEl, odessaNet);
-
-    midlandInEl.classList.remove("loading");
-    odessaInEl.classList.remove("loading");
-    midlandOutEl.classList.remove("loading");
-    odessaOutEl.classList.remove("loading");
 
     document.getElementById("lastUpdated").textContent =
       `Last updated: ${new Date().toLocaleString()}`;
@@ -310,12 +433,6 @@ fetch(url)
     console.error("Dashboard load error:", err);
     document.getElementById("midlandOpen").textContent = "Error";
     document.getElementById("odessaOpen").textContent = "Error";
-    document.getElementById("midlandIn").textContent = "Error";
-    document.getElementById("odessaIn").textContent = "Error";
-    document.getElementById("midlandOut").textContent = "Error";
-    document.getElementById("odessaOut").textContent = "Error";
-    document.getElementById("midlandNet").textContent = "Error";
-    document.getElementById("odessaNet").textContent = "Error";
     document.getElementById("lastUpdated").textContent =
       "Could not load live sheet data. Make sure the Capacity Dashboard sheet is shared as Anyone with the link → Viewer.";
   });
