@@ -20,6 +20,7 @@
       --yellow:#eab308;
       --red:#ef4444;
       --blue:#60a5fa;
+      --purple:#a78bfa;
     }
 
     * { box-sizing:border-box; }
@@ -57,6 +58,39 @@
       max-width: 1200px;
       margin: 0 auto;
     }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .tab-btn {
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.10);
+      color: var(--text);
+      padding: 14px 16px;
+      border-radius: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 22px rgba(0,0,0,.18);
+      backdrop-filter: blur(8px);
+      transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
+    }
+
+    .tab-btn:hover {
+      background: rgba(255,255,255,.12);
+      transform: translateY(-2px);
+    }
+
+    .tab-btn.active {
+      background: rgba(96,165,250,.18);
+      border-color: rgba(96,165,250,.38);
+      box-shadow: 0 10px 24px rgba(0,0,0,.22);
+    }
+
+    .view { display: none; }
+    .view.active { display: block; }
 
     .verse-box{
       background: rgba(255,255,255,.07);
@@ -139,6 +173,7 @@
       font-size: 28px;
       font-weight: 800;
       line-height: 1.05;
+      word-break: break-word;
     }
 
     .sub {
@@ -151,10 +186,16 @@
     .yellow { color: var(--yellow); }
     .red { color: var(--red); }
     .blue { color: var(--blue); }
+    .purple { color: var(--purple); }
     .loading { opacity: 0.65; }
 
-    a.btn {
+    .status-on { color: var(--green); font-weight: 900; }
+    .status-off { color: var(--red); font-weight: 900; }
+    .status-other { color: var(--yellow); font-weight: 900; }
+
+    a.btn, button.action-btn {
       display: block;
+      width: 100%;
       background: rgba(255,255,255,.08);
       border: 1px solid rgba(255,255,255,.10);
       padding: 18px;
@@ -165,9 +206,12 @@
       box-shadow: 0 8px 22px rgba(0,0,0,.18);
       backdrop-filter: blur(8px);
       transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
+      cursor: pointer;
+      text-align: center;
+      font-size: 16px;
     }
 
-    a.btn:hover {
+    a.btn:hover, button.action-btn:hover {
       background: rgba(255,255,255,.12);
       transform: translateY(-2px);
       box-shadow: 0 12px 28px rgba(0,0,0,.24);
@@ -187,14 +231,115 @@
       padding: 6px 0 12px;
     }
 
-    .status-on { color: var(--green); font-weight: 900; }
-    .status-off { color: var(--red); font-weight: 900; }
-    .status-other { color: var(--yellow); font-weight: 900; }
+    .filters {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 14px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      font-size: 16px;
+      outline: none;
+    }
+
+    .lookup-summary {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .mini-card {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .mini-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: .7px;
+      font-weight: 700;
+    }
+
+    .mini-value {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--blue);
+    }
+
+    .range-results {
+      margin-top: 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 640px;
+    }
+
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th {
+      color: #cbd5e1;
+      background: rgba(255,255,255,.05);
+      position: sticky;
+      top: 0;
+    }
+
+    td {
+      color: #f8fafc;
+    }
+
+    .empty-state {
+      padding: 20px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed rgba(255,255,255,.15);
+      border-radius: 14px;
+      background: rgba(255,255,255,.04);
+    }
 
     @media (min-width: 700px) {
       .grid-2 { grid-template-columns: 1fr 1fr; }
       .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
       .grid-4 { grid-template-columns: 1fr 1fr; }
+      .filters { grid-template-columns: 1fr 1fr auto; align-items: end; }
+      .lookup-summary { grid-template-columns: repeat(3, 1fr); }
     }
 
     @media (min-width: 1000px) {
@@ -207,105 +352,164 @@
   <header>CJT Field App</header>
 
   <div class="wrap">
-    <div class="verse-box">
-      <div class="verse-label">Daily Verse</div>
-      <div id="verseText" class="verse-text">Loading verse...</div>
+    <div class="tabs">
+      <button id="dashboardTab" class="tab-btn active" type="button">Dashboard</button>
+      <button id="salesTab" class="tab-btn" type="button">Oil Sales Lookup</button>
     </div>
 
-    <div class="section-title">Live Capacity</div>
-    <div class="grid-2">
-      <div class="card">
-        <h2>Midland Open Space</h2>
-        <div id="midlandOpen" class="big-number loading">Loading...</div>
-        <div class="sub">Live from Capacity Dashboard</div>
+    <div id="dashboardView" class="view active">
+      <div class="verse-box">
+        <div class="verse-label">Daily Verse</div>
+        <div id="verseText" class="verse-text">Loading verse...</div>
       </div>
 
-      <div class="card">
-        <h2>Odessa Open Space</h2>
-        <div id="odessaOpen" class="big-number loading">Loading...</div>
-        <div class="sub">Live from Capacity Dashboard</div>
+      <div class="section-title">Live Capacity</div>
+      <div class="grid-2">
+        <div class="card">
+          <h2>Midland Open Space</h2>
+          <div id="midlandOpen" class="big-number loading">Loading...</div>
+          <div class="sub">Live from Capacity Dashboard</div>
+        </div>
+
+        <div class="card">
+          <h2>Odessa Open Space</h2>
+          <div id="odessaOpen" class="big-number loading">Loading...</div>
+          <div class="sub">Live from Capacity Dashboard</div>
+        </div>
       </div>
+
+      <div class="section-title">Oil On Yard</div>
+      <div class="grid-3">
+        <div class="card">
+          <h2>Midland Oil On Yard</h2>
+          <div id="midlandOil" class="big-number loading">Loading...</div>
+          <div class="sub">Rolling total since start date</div>
+        </div>
+
+        <div class="card">
+          <h2>Odessa Oil On Yard</h2>
+          <div id="odessaOil" class="big-number loading">Loading...</div>
+          <div class="sub">Rolling total since start date</div>
+        </div>
+
+        <div class="card">
+          <h2>Combined Oil On Yard</h2>
+          <div id="combinedOil" class="big-number loading">Loading...</div>
+          <div class="sub">Both facilities combined</div>
+        </div>
+      </div>
+
+      <div class="section-title">7 Day Oil Sales (Sun-Sat)</div>
+      <div class="grid-3">
+        <div class="card">
+          <h2>Midland 7 Day Sales</h2>
+          <div id="midlandSales7" class="big-number loading">Loading...</div>
+          <div id="midlandSales7Sub" class="sub">Most recent completed Sunday-Saturday week</div>
+        </div>
+
+        <div class="card">
+          <h2>Odessa 7 Day Sales</h2>
+          <div id="odessaSales7" class="big-number loading">Loading...</div>
+          <div id="odessaSales7Sub" class="sub">Most recent completed Sunday-Saturday week</div>
+        </div>
+
+        <div class="card">
+          <h2>Combined 7 Day Sales</h2>
+          <div id="combinedSales7" class="big-number loading">Loading...</div>
+          <div id="combinedSales7Sub" class="sub">Most recent completed Sunday-Saturday week</div>
+        </div>
+      </div>
+
+      <div class="section-title">24 Hour Operations</div>
+      <div class="grid-4">
+        <div class="card">
+          <h2>Midland Processing Hours</h2>
+          <div id="midlandProc" class="kpi loading">Loading...</div>
+        </div>
+
+        <div class="card">
+          <h2>Odessa Processing Hours</h2>
+          <div id="odessaProc" class="kpi loading">Loading...</div>
+        </div>
+
+        <div class="card">
+          <h2>Midland Downtime Hours</h2>
+          <div id="midlandDown" class="kpi loading">Loading...</div>
+        </div>
+
+        <div class="card">
+          <h2>Odessa Downtime Hours</h2>
+          <div id="odessaDown" class="kpi loading">Loading...</div>
+        </div>
+
+        <div class="card">
+          <h2>Midland Status</h2>
+          <div id="midlandStatus" class="kpi loading">Loading...</div>
+        </div>
+
+        <div class="card">
+          <h2>Odessa Status</h2>
+          <div id="odessaStatus" class="kpi loading">Loading...</div>
+        </div>
+
+        <div class="card">
+          <h2>Midland Last Operator</h2>
+          <div id="midlandOperator" class="kpi loading">Loading...</div>
+        </div>
+
+        <div class="card">
+          <h2>Odessa Last Operator</h2>
+          <div id="odessaOperator" class="kpi loading">Loading...</div>
+        </div>
+      </div>
+
+      <div id="lastUpdated" class="muted">Waiting on live data...</div>
+
+      <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLScvZA6r7Nlp5y3KfMqB2SHBV5hKeRXVFVGz7s_RGkc0ioSWZg/viewform" target="_blank">CJT Tank Levels</a>
+      <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSdjyN2IfoZTlYmSfGk9GrTbvs-uX7JyBUjGpZTHQg7o4kjGMQ/viewform" target="_blank">Driver Pre Trip Inspection</a>
+      <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSe-bXzKUNqqX6doGBI2lDKWOBpI4zVyLcT2RWzi4ECenynpiQ/viewform" target="_blank">Driver Loader Tracker</a>
+      <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSeRBl8u1W-MkQWCsHBejOWgxugN30eF7VE1_VH4ASVaUgb0ng/viewform" target="_blank">Offload Log</a>
+      <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLScz3_nfZaCuZjce2TwjcqwgdXTabMn205amwdUyor3GXwuvqA/viewform" target="_blank">Oil Sales Report</a>
+      <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSfqmb4-FSJQlIILMDa2IqIhYwao8T1AtzqpHHoZVi4mZMDlGA/viewform" target="_blank">Centrifuge Health Log</a>
+      <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSfI_mcJyZ9qFtrJnaLN6tj3lT8KFqBgQ2Dn65C43DLyUPsi5Q/viewform" target="_blank">Decanter Flush Log</a>
+      <a class="btn" href="https://docs.google.com/spreadsheets/d/18F9w2pAFuSukRMoEHIF0bj6gyc8yPEKJh0udq2u0_yM/edit?gid=0#gid=0" target="_blank">Capacity Dashboard</a>
+
+      <div class="footer-note">CJT Live Operations Dashboard</div>
     </div>
 
-    <div class="section-title">Oil On Yard</div>
-    <div class="grid-3">
+    <div id="salesLookupView" class="view">
+      <div class="section-title">Oil Sales Date Range Lookup</div>
       <div class="card">
-        <h2>Midland Oil On Yard</h2>
-        <div id="midlandOil" class="big-number loading">Loading...</div>
-        <div class="sub">Rolling total since start date</div>
-      </div>
+        <div class="filters">
+          <div class="field">
+            <label for="fromDate">From Date</label>
+            <input id="fromDate" type="date">
+          </div>
 
-      <div class="card">
-        <h2>Odessa Oil On Yard</h2>
-        <div id="odessaOil" class="big-number loading">Loading...</div>
-        <div class="sub">Rolling total since start date</div>
-      </div>
+          <div class="field">
+            <label for="toDate">To Date</label>
+            <input id="toDate" type="date">
+          </div>
 
-      <div class="card">
-        <h2>Combined Oil On Yard</h2>
-        <div id="combinedOil" class="big-number loading">Loading...</div>
-        <div class="sub">Both facilities combined</div>
-      </div>
-    </div>
+          <button id="runLookupBtn" class="action-btn" type="button">Run Lookup</button>
+        </div>
 
-    <div class="section-title">24 Hour Operations</div>
-    <div class="grid-4">
-      <div class="card">
-        <h2>Midland Processing Hours</h2>
-        <div id="midlandProc" class="kpi loading">Loading...</div>
-      </div>
+        <div id="lookupMeta" class="sub" style="margin-top:14px;">Choose a date range and press Run Lookup.</div>
 
-      <div class="card">
-        <h2>Odessa Processing Hours</h2>
-        <div id="odessaProc" class="kpi loading">Loading...</div>
-      </div>
+        <div id="lookupSummary" class="lookup-summary"></div>
 
-      <div class="card">
-        <h2>Midland Downtime Hours</h2>
-        <div id="midlandDown" class="kpi loading">Loading...</div>
-      </div>
+        <div class="range-results">
+          <div class="section-title" style="margin-top:0;">Facility Totals</div>
+          <div id="facilityTotalsWrap"></div>
 
-      <div class="card">
-        <h2>Odessa Downtime Hours</h2>
-        <div id="odessaDown" class="kpi loading">Loading...</div>
-      </div>
-
-      <div class="card">
-        <h2>Midland Status</h2>
-        <div id="midlandStatus" class="kpi loading">Loading...</div>
-      </div>
-
-      <div class="card">
-        <h2>Odessa Status</h2>
-        <div id="odessaStatus" class="kpi loading">Loading...</div>
-      </div>
-
-      <div class="card">
-        <h2>Midland Last Operator</h2>
-        <div id="midlandOperator" class="kpi loading">Loading...</div>
-      </div>
-
-      <div class="card">
-        <h2>Odessa Last Operator</h2>
-        <div id="odessaOperator" class="kpi loading">Loading...</div>
+          <div class="section-title">Ticket Detail</div>
+          <div id="ticketDetailsWrap"></div>
+        </div>
       </div>
     </div>
-
-    <div id="lastUpdated" class="muted">Waiting on live data...</div>
-
-    <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLScvZA6r7Nlp5y3KfMqB2SHBV5hKeRXVFVGz7s_RGkc0ioSWZg/viewform" target="_blank">CJT Tank Levels</a>
-    <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSdjyN2IfoZTlYmSfGk9GrTbvs-uX7JyBUjGpZTHQg7o4kjGMQ/viewform" target="_blank">Driver Pre Trip Inspection</a>
-    <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSe-bXzKUNqqX6doGBI2lDKWOBpI4zVyLcT2RWzi4ECenynpiQ/viewform" target="_blank">Driver Loader Tracker</a>
-    <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSeRBl8u1W-MkQWCsHBejOWgxugN30eF7VE1_VH4ASVaUgb0ng/viewform" target="_blank">Offload Log</a>
-    <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLScz3_nfZaCuZjce2TwjcqwgdXTabMn205amwdUyor3GXwuvqA/viewform" target="_blank">Oil Sales Report</a>
-    <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSfqmb4-FSJQlIILMDa2IqIhYwao8T1AtzqpHHoZVi4mZMDlGA/viewform" target="_blank">Centrifuge Health Log</a>
-    <a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSfI_mcJyZ9qFtrJnaLN6tj3lT8KFqBgQ2Dn65C43DLyUPsi5Q/viewform" target="_blank">Decanter Flush Log</a>
-    <a class="btn" href="https://docs.google.com/spreadsheets/d/18F9w2pAFuSukRMoEHIF0bj6gyc8yPEKJh0udq2u0_yM/edit?gid=0#gid=0" target="_blank">Capacity Dashboard</a>
-
-    <div class="footer-note">CJT Live Operations Dashboard</div>
   </div>
 
- <script>
+  <script>
 const verses = [
 "Genesis 1:1 — In the beginning God created the heavens and the earth.",
 "Genesis 50:20 — What you meant for evil, God meant for good.",
@@ -413,8 +617,10 @@ const verses = [
 "James 4:8 — Draw near to God and He will draw near to you.",
 "1 John 5:14 — If we ask anything according to His will, He hears us."
 ];
+
+
     function getDailyVerse() {
-      const start = new Date("2026-01-01");
+      const start = new Date("2026-01-01T00:00:00");
       const now = new Date();
       const diff = Math.floor((now - start) / (1000 * 60 * 60 * 24));
       return verses[Math.abs(diff) % verses.length];
@@ -425,10 +631,13 @@ const verses = [
     const sheetId = "18F9w2pAFuSukRMoEHIF0bj6gyc8yPEKJh0udq2u0_yM";
     const capacityURL = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${encodeURIComponent("Capacity Dashboard")}&tqx=out:json`;
     const opsURL = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${encodeURIComponent("Centrifuge_Stats")}&tqx=out:json`;
+    const oilSalesURL = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${encodeURIComponent("OilSales_Data")}&tqx=out:json`;
+
+    let oilSalesRecords = [];
 
     function cleanNumber(value) {
       if (value === null || value === undefined || value === "") return 0;
-      const num = Number(value);
+      const num = Number(String(value).replace(/,/g, "").trim());
       return isNaN(num) ? 0 : num;
     }
 
@@ -438,6 +647,51 @@ const verses = [
 
     function fmtHours(value) {
       return `${cleanNumber(value).toFixed(1)} hrs`;
+    }
+
+    function fmtDate(date) {
+      if (!(date instanceof Date) || isNaN(date.getTime())) return "";
+      return date.toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+      });
+    }
+
+    function toInputDateValue(date) {
+      if (!(date instanceof Date) || isNaN(date.getTime())) return "";
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function atStartOfDay(date) {
+      const d = new Date(date);
+      d.setHours(0, 0, 0, 0);
+      return d;
+    }
+
+    function atEndOfDay(date) {
+      const d = new Date(date);
+      d.setHours(23, 59, 59, 999);
+      return d;
+    }
+
+    function getMostRecentCompletedWeekRange() {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const end = new Date(today);
+      end.setDate(today.getDate() - ((today.getDay() + 1) % 7));
+
+      const start = new Date(end);
+      start.setDate(end.getDate() - 6);
+
+      return {
+        start: atStartOfDay(start),
+        end: atEndOfDay(end)
+      };
     }
 
     function setCapacityColor(el, value) {
@@ -458,20 +712,37 @@ const verses = [
       else el.classList.add("status-other");
     }
 
-    function setOilColor(el) {
-      el.classList.remove("green", "yellow", "red", "loading");
-      el.classList.add("blue");
+    function setOilColor(el, colorClass = "blue") {
+      el.classList.remove("green", "yellow", "red", "blue", "purple", "loading");
+      el.classList.add(colorClass);
     }
 
     function parseGoogleSheet(text) {
-      return JSON.parse(text.substring(47).slice(0, -2)).table.rows;
+      const jsonText = text
+        .substring(47)
+        .slice(0, -2)
+        .replace(/Date\((\d+),(\d+),(\d+)(?:,(\d+),(\d+),(\d+))?\)/g, '"Date($1,$2,$3,$4,$5,$6)"');
+
+      return JSON.parse(jsonText).table.rows;
+    }
+
+    function getCell(row, colIndex) {
+      if (!row || !row.c || !row.c[colIndex]) return null;
+      return row.c[colIndex];
     }
 
     function getCellValue(row, colIndex) {
-      if (!row || !row.c || !row.c[colIndex] || typeof row.c[colIndex].v === "undefined") {
-        return "";
-      }
-      return row.c[colIndex].v;
+      const cell = getCell(row, colIndex);
+      if (!cell || typeof cell.v === "undefined" || cell.v === null) return "";
+      return cell.v;
+    }
+
+    function getCellDisplayValue(row, colIndex) {
+      const cell = getCell(row, colIndex);
+      if (!cell) return "";
+      if (typeof cell.f !== "undefined" && cell.f !== null && cell.f !== "") return String(cell.f);
+      if (typeof cell.v !== "undefined" && cell.v !== null) return String(cell.v);
+      return "";
     }
 
     function findMetricRow(rows, metricName) {
@@ -490,6 +761,319 @@ const verses = [
       }
       return { midland: "", odessa: "" };
     }
+
+    function parseSheetDate(rawValue, fallbackDisplay = "") {
+      if (rawValue instanceof Date && !isNaN(rawValue.getTime())) {
+        return atStartOfDay(rawValue);
+      }
+
+      if (typeof rawValue === "string") {
+        const trimmed = rawValue.trim();
+
+        const gvizMatch = trimmed.match(/^Date\((\d+),(\d+),(\d+)(?:,(\d+),(\d+),(\d+))?\)$/);
+        if (gvizMatch) {
+          const year = Number(gvizMatch[1]);
+          const month = Number(gvizMatch[2]);
+          const day = Number(gvizMatch[3]);
+          const hour = Number(gvizMatch[4] || 0);
+          const minute = Number(gvizMatch[5] || 0);
+          const second = Number(gvizMatch[6] || 0);
+          return new Date(year, month, day, hour, minute, second);
+        }
+
+        const parsed = new Date(trimmed);
+        if (!isNaN(parsed.getTime())) {
+          return atStartOfDay(parsed);
+        }
+      }
+
+      if (fallbackDisplay) {
+        const parsedFallback = new Date(fallbackDisplay);
+        if (!isNaN(parsedFallback.getTime())) {
+          return atStartOfDay(parsedFallback);
+        }
+      }
+
+      return null;
+    }
+
+    function normalizeFacilityName(value) {
+      const raw = String(value || "").trim();
+      if (!raw) return "Unknown";
+
+      const upper = raw.toUpperCase();
+
+      if (upper.includes("MIDLAND")) return "Midland";
+      if (upper.includes("ODESSA")) return "Odessa";
+
+      return raw
+        .toLowerCase()
+        .replace(/\b\w/g, chr => chr.toUpperCase());
+    }
+
+    function loadOilSalesData(rows) {
+      const records = [];
+
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row || !row.c) continue;
+
+        const rawDate = getCellValue(row, 2);       // C
+        const dateDisplay = getCellDisplayValue(row, 2);
+        const ticket = getCellDisplayValue(row, 4); // E
+        const pickupLease = getCellDisplayValue(row, 5); // F
+        const bblTotal = cleanNumber(getCellValue(row, 10)); // K
+
+        const saleDate = parseSheetDate(rawDate, dateDisplay);
+        const facility = normalizeFacilityName(pickupLease);
+
+        if (!saleDate || !ticket || !pickupLease || bblTotal <= 0) continue;
+
+        records.push({
+          saleDate,
+          saleDateText: fmtDate(saleDate),
+          ticket: String(ticket).trim(),
+          pickupLease: String(pickupLease).trim(),
+          facility,
+          bblTotal
+        });
+      }
+
+      oilSalesRecords = records;
+      renderWeeklySalesCards();
+      setDefaultLookupDates();
+      runDateRangeLookup();
+    }
+
+    function getSalesInRange(startDate, endDate) {
+      const start = atStartOfDay(startDate);
+      const end = atEndOfDay(endDate);
+
+      return oilSalesRecords.filter(record => {
+        return record.saleDate >= start && record.saleDate <= end;
+      });
+    }
+
+    function summarizeSales(records) {
+      const byFacility = {};
+      let totalBbl = 0;
+      let totalTickets = 0;
+
+      records.forEach(record => {
+        if (!byFacility[record.facility]) {
+          byFacility[record.facility] = {
+            facility: record.facility,
+            totalBbl: 0,
+            tickets: 0
+          };
+        }
+
+        byFacility[record.facility].totalBbl += record.bblTotal;
+        byFacility[record.facility].tickets += 1;
+        totalBbl += record.bblTotal;
+        totalTickets += 1;
+      });
+
+      const facilityList = Object.values(byFacility).sort((a, b) => b.totalBbl - a.totalBbl);
+
+      return {
+        totalBbl,
+        totalTickets,
+        facilityList
+      };
+    }
+
+    function renderWeeklySalesCards() {
+      const range = getMostRecentCompletedWeekRange();
+      const records = getSalesInRange(range.start, range.end);
+      const summary = summarizeSales(records);
+
+      const midland = summary.facilityList.find(item => item.facility === "Midland");
+      const odessa = summary.facilityList.find(item => item.facility === "Odessa");
+
+      const midlandValue = midland ? midland.totalBbl : 0;
+      const odessaValue = odessa ? odessa.totalBbl : 0;
+      const combinedValue = summary.totalBbl;
+
+      const rangeText = `${fmtDate(range.start)} - ${fmtDate(range.end)}`;
+
+      const midlandEl = document.getElementById("midlandSales7");
+      const odessaEl = document.getElementById("odessaSales7");
+      const combinedEl = document.getElementById("combinedSales7");
+
+      midlandEl.textContent = fmtBbl(midlandValue);
+      odessaEl.textContent = fmtBbl(odessaValue);
+      combinedEl.textContent = fmtBbl(combinedValue);
+
+      setOilColor(midlandEl, "purple");
+      setOilColor(odessaEl, "purple");
+      setOilColor(combinedEl, "purple");
+
+      document.getElementById("midlandSales7Sub").textContent = `${rangeText} • ${midland ? midland.tickets : 0} tickets`;
+      document.getElementById("odessaSales7Sub").textContent = `${rangeText} • ${odessa ? odessa.tickets : 0} tickets`;
+      document.getElementById("combinedSales7Sub").textContent = `${rangeText} • ${summary.totalTickets} tickets`;
+    }
+
+    function setDefaultLookupDates() {
+      const range = getMostRecentCompletedWeekRange();
+      document.getElementById("fromDate").value = toInputDateValue(range.start);
+      document.getElementById("toDate").value = toInputDateValue(range.end);
+    }
+
+    function renderLookupSummary(summary, startDate, endDate) {
+      const html = `
+        <div class="mini-card">
+          <div class="mini-label">Date Range</div>
+          <div class="mini-value">${fmtDate(startDate)} - ${fmtDate(endDate)}</div>
+        </div>
+        <div class="mini-card">
+          <div class="mini-label">Total Oil Sold</div>
+          <div class="mini-value">${fmtBbl(summary.totalBbl)}</div>
+        </div>
+        <div class="mini-card">
+          <div class="mini-label">Total Tickets</div>
+          <div class="mini-value">${summary.totalTickets.toLocaleString()}</div>
+        </div>
+      `;
+      document.getElementById("lookupSummary").innerHTML = html;
+    }
+
+    function renderFacilityTotals(summary) {
+      const wrap = document.getElementById("facilityTotalsWrap");
+
+      if (!summary.facilityList.length) {
+        wrap.innerHTML = `<div class="empty-state">No oil sales found for that date range.</div>`;
+        return;
+      }
+
+      let rowsHtml = "";
+      summary.facilityList.forEach(item => {
+        rowsHtml += `
+          <tr>
+            <td>${item.facility}</td>
+            <td>${fmtBbl(item.totalBbl)}</td>
+            <td>${item.tickets.toLocaleString()}</td>
+          </tr>
+        `;
+      });
+
+      wrap.innerHTML = `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Facility</th>
+                <th>Oil Sold</th>
+                <th>Tickets</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderTicketDetails(records) {
+      const wrap = document.getElementById("ticketDetailsWrap");
+
+      if (!records.length) {
+        wrap.innerHTML = `<div class="empty-state">No ticket detail to display for that range.</div>`;
+        return;
+      }
+
+      const sorted = records.slice().sort((a, b) => b.saleDate - a.saleDate);
+
+      let rowsHtml = "";
+      sorted.forEach(record => {
+        rowsHtml += `
+          <tr>
+            <td>${record.saleDateText}</td>
+            <td>${record.ticket}</td>
+            <td>${record.facility}</td>
+            <td>${record.pickupLease}</td>
+            <td>${fmtBbl(record.bblTotal)}</td>
+          </tr>
+        `;
+      });
+
+      wrap.innerHTML = `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Ticket #</th>
+                <th>Facility</th>
+                <th>Pickup Lease</th>
+                <th>BBL Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function runDateRangeLookup() {
+      const fromValue = document.getElementById("fromDate").value;
+      const toValue = document.getElementById("toDate").value;
+      const lookupMeta = document.getElementById("lookupMeta");
+
+      if (!fromValue || !toValue) {
+        lookupMeta.textContent = "Choose both dates first.";
+        document.getElementById("lookupSummary").innerHTML = "";
+        document.getElementById("facilityTotalsWrap").innerHTML = `<div class="empty-state">Choose a valid date range.</div>`;
+        document.getElementById("ticketDetailsWrap").innerHTML = `<div class="empty-state">Choose a valid date range.</div>`;
+        return;
+      }
+
+      const startDate = atStartOfDay(new Date(fromValue + "T00:00:00"));
+      const endDate = atEndOfDay(new Date(toValue + "T00:00:00"));
+
+      if (startDate > endDate) {
+        lookupMeta.textContent = "From Date cannot be after To Date.";
+        document.getElementById("lookupSummary").innerHTML = "";
+        document.getElementById("facilityTotalsWrap").innerHTML = `<div class="empty-state">Fix the date range and run it again.</div>`;
+        document.getElementById("ticketDetailsWrap").innerHTML = `<div class="empty-state">Fix the date range and run it again.</div>`;
+        return;
+      }
+
+      const records = getSalesInRange(startDate, endDate);
+      const summary = summarizeSales(records);
+
+      lookupMeta.textContent = `Showing oil sales from ${fmtDate(startDate)} through ${fmtDate(endDate)}.`;
+
+      renderLookupSummary(summary, startDate, endDate);
+      renderFacilityTotals(summary);
+      renderTicketDetails(records);
+    }
+
+    function showView(viewName) {
+      const dashboardTab = document.getElementById("dashboardTab");
+      const salesTab = document.getElementById("salesTab");
+      const dashboardView = document.getElementById("dashboardView");
+      const salesLookupView = document.getElementById("salesLookupView");
+
+      if (viewName === "sales") {
+        dashboardTab.classList.remove("active");
+        salesTab.classList.add("active");
+        dashboardView.classList.remove("active");
+        salesLookupView.classList.add("active");
+      } else {
+        salesTab.classList.remove("active");
+        dashboardTab.classList.add("active");
+        salesLookupView.classList.remove("active");
+        dashboardView.classList.add("active");
+      }
+    }
+
+    document.getElementById("dashboardTab").addEventListener("click", () => showView("dashboard"));
+    document.getElementById("salesTab").addEventListener("click", () => showView("sales"));
+    document.getElementById("runLookupBtn").addEventListener("click", runDateRangeLookup);
 
     // Capacity + Oil
     fetch(capacityURL)
@@ -578,6 +1162,25 @@ const verses = [
         ].forEach(id => {
           document.getElementById(id).textContent = "Error";
         });
+      });
+
+    // Oil Sales Data
+    fetch(oilSalesURL)
+      .then(res => res.text())
+      .then(text => {
+        const rows = parseGoogleSheet(text);
+        loadOilSalesData(rows);
+      })
+      .catch(err => {
+        console.error("Oil sales load error:", err);
+
+        ["midlandSales7","odessaSales7","combinedSales7"].forEach(id => {
+          document.getElementById(id).textContent = "Error";
+        });
+
+        document.getElementById("lookupMeta").textContent = "Could not load OilSales_Data.";
+        document.getElementById("facilityTotalsWrap").innerHTML = `<div class="empty-state">Oil sales data failed to load.</div>`;
+        document.getElementById("ticketDetailsWrap").innerHTML = `<div class="empty-state">Oil sales data failed to load.</div>`;
       })
       .finally(() => {
         document.getElementById("lastUpdated").textContent =
@@ -590,4 +1193,3 @@ const verses = [
   </script>
 </body>
 </html>
-
