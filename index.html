@@ -1205,60 +1205,78 @@ const verses = [
         });
       });
 
-    fetch(oilSalesURL)
-      .then(res => res.text())
-      .then(text => {
-        const rows = parseGoogleSheet(text);
-        const records = [];
+   fetch(oilSalesURL)
+  .then(res => res.text())
+  .then(text => {
+    const rows = parseGoogleSheet(text);
+    const records = [];
 
-        for (let i = 1; i < rows.length; i++) {
-          const row = rows[i];
+    console.log("OilSales_Data rows loaded:", rows.length);
 
-          const saleDate = parseSheetDate(row);
-          const ticket = getCellDisplayValue(row, 4);
-          const pickupLease = getCellDisplayValue(row, 5);
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
 
-          let bblTotal = cleanNumber(getCellValue(row, 10));
-          if (!bblTotal) {
-            bblTotal = cleanNumber(getCellDisplayValue(row, 10));
-          }
+      const saleDate = parseSheetDate(row);
+      const ticket = getCellDisplayValue(row, 4);       // Column E
+      const pickupLease = getCellDisplayValue(row, 5);  // Column F
 
-          if (!saleDate || !ticket || !pickupLease || bblTotal <= 0) {
-            continue;
-          }
+      let bblTotal = cleanNumber(getCellValue(row, 10)); // Column K raw
+      if (!bblTotal) {
+        bblTotal = cleanNumber(getCellDisplayValue(row, 10)); // fallback
+      }
 
-          records.push({
-            saleDate,
-            saleDateText: fmtDate(saleDate),
-            ticket: String(ticket).trim(),
-            pickupLease: String(pickupLease).trim(),
-            facility: normalizeFacilityName(pickupLease),
-            bblTotal
-          });
-        }
+      // Only require the fields actually needed to count oil
+      if (!saleDate || !pickupLease || bblTotal <= 0) {
+        continue;
+      }
 
-        oilSalesRecords = records;
-        renderWeeklySalesCards();
-        drawOilSalesChart();
-        setDefaultLookupDates();
-        runDateRangeLookup();
-      })
-      .catch(err => {
-        console.error("Oil sales load error:", err);
-        document.getElementById("midlandSales7").textContent = "Error";
-        document.getElementById("odessaSales7").textContent = "Error";
-        document.getElementById("combinedSales7").textContent = "Error";
-        document.getElementById("facilityTotalsWrap").innerHTML = `<div class="empty-state">Oil sales data failed to load.</div>`;
-        document.getElementById("ticketDetailsWrap").innerHTML = `<div class="empty-state">Oil sales data failed to load.</div>`;
-      })
-      .finally(() => {
-        document.getElementById("lastUpdated").textContent =
-          `Last updated: ${new Date().toLocaleString()}`;
+      records.push({
+        saleDate,
+        saleDateText: fmtDate(saleDate),
+        ticket: String(ticket || "").trim(),
+        pickupLease: String(pickupLease).trim(),
+        facility: normalizeFacilityName(pickupLease),
+        bblTotal
       });
-
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("sw.js");
     }
+
+    oilSalesRecords = records;
+
+    console.log("Valid oil sales records:", oilSalesRecords.length);
+    console.log("Sample records:", oilSalesRecords.slice(0, 10));
+
+    // Update dashboard
+    renderWeeklySalesCards();
+    drawOilSalesChart();
+
+    // Set lookup default dates
+    setDefaultLookupDates();
+
+    // Run lookup if tab is used
+    runDateRangeLookup();
+  })
+  .catch(err => {
+    console.error("Oil sales load error:", err);
+
+    document.getElementById("midlandSales7").textContent = "Error";
+    document.getElementById("odessaSales7").textContent = "Error";
+    document.getElementById("combinedSales7").textContent = "Error";
+
+    document.getElementById("facilityTotalsWrap").innerHTML =
+      `<div class="empty-state">Oil sales data failed to load.</div>`;
+
+    document.getElementById("ticketDetailsWrap").innerHTML =
+      `<div class="empty-state">Oil sales data failed to load.</div>`;
+  })
+  .finally(() => {
+    document.getElementById("lastUpdated").textContent =
+      `Last updated: ${new Date().toLocaleString()}`;
+  });
+
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js");
+}
   </script>
 </body>
 </html>
