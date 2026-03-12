@@ -193,6 +193,20 @@
     .status-off { color: var(--red); font-weight: 900; }
     .status-other { color: var(--yellow); font-weight: 900; }
 
+    .chart-wrap {
+      width: 100%;
+      height: 280px;
+      position: relative;
+    }
+
+    .chart-wrap canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: rgba(255,255,255,.04);
+      border-radius: 14px;
+    }
+
     a.btn, button.action-btn {
       display: block;
       width: 100%;
@@ -398,7 +412,6 @@
           <div class="sub">Both facilities combined</div>
         </div>
       </div>
-
       <div class="section-title">7 Day Oil Sales (Sun-Sat)</div>
       <div class="grid-3">
         <div class="card">
@@ -418,6 +431,15 @@
           <div id="combinedSales7" class="big-number loading">Loading...</div>
           <div id="combinedSales7Sub" class="sub">Most recent completed Sunday-Saturday week</div>
         </div>
+      </div>
+
+      <div class="section-title">Oil Sales Trend</div>
+      <div class="card">
+        <h2>Combined Daily Oil Sales - Last 14 Days</h2>
+        <div class="chart-wrap">
+          <canvas id="oilSalesChart"></canvas>
+        </div>
+        <div id="oilSalesChartSub" class="sub">Daily total BBL sold from OilSales_Data</div>
       </div>
 
       <div class="section-title">24 Hour Operations</div>
@@ -699,7 +721,6 @@ const verses = [
     function setCapacityColor(el, value) {
       el.classList.remove("green", "yellow", "red", "loading");
       const v = cleanNumber(value);
-
       if (v < 300) el.classList.add("red");
       else if (v <= 1000) el.classList.add("yellow");
       else el.classList.add("green");
@@ -708,7 +729,6 @@ const verses = [
     function setStatusColor(el, value) {
       el.classList.remove("status-on", "status-off", "status-other", "loading");
       const v = String(value || "").trim().toUpperCase();
-
       if (v === "ON" || v === "ACTIVE") el.classList.add("status-on");
       else if (v === "OFF" || v === "SHUTDOWN" || v === "CONSTRUCTION") el.classList.add("status-off");
       else el.classList.add("status-other");
@@ -724,9 +744,7 @@ const verses = [
     }
 
     function getCellValue(row, colIndex) {
-      if (!row || !row.c || !row.c[colIndex] || typeof row.c[colIndex].v === "undefined") {
-        return "";
-      }
+      if (!row || !row.c || !row.c[colIndex] || typeof row.c[colIndex].v === "undefined") return "";
       return row.c[colIndex].v;
     }
 
@@ -741,7 +759,6 @@ const verses = [
     function findMetricRow(rows, metricName) {
       for (const row of rows) {
         if (!row || !row.c) continue;
-
         for (let i = 0; i < row.c.length; i++) {
           const val = row.c[i] && typeof row.c[i].v !== "undefined" ? String(row.c[i].v).trim() : "";
           if (val === metricName) {
@@ -755,25 +772,30 @@ const verses = [
       return { midland: "", odessa: "" };
     }
 
-    function parseSheetDate(value) {
-      if (value instanceof Date && !isNaN(value.getTime())) {
-        return atStartOfDay(value);
+    function parseSheetDate(row) {
+      const rawValue = getCellValue(row, 2);
+      const displayValue = getCellDisplayValue(row, 2);
+
+      if (displayValue) {
+        const parsedDisplay = new Date(displayValue);
+        if (!isNaN(parsedDisplay.getTime())) return atStartOfDay(parsedDisplay);
       }
-      if (typeof value === "string" && value.trim()) {
-        const parsed = new Date(value);
-        if (!isNaN(parsed.getTime())) return atStartOfDay(parsed);
+
+      if (rawValue instanceof Date && !isNaN(rawValue.getTime())) {
+        return atStartOfDay(rawValue);
       }
+
+      if (rawValue !== null && rawValue !== undefined && rawValue !== "") {
+        const parsedRaw = new Date(String(rawValue));
+        if (!isNaN(parsedRaw.getTime())) return atStartOfDay(parsedRaw);
+      }
+
       return null;
     }
 
     function normalizeFacilityName(value) {
       const raw = String(value || "").trim();
       if (!raw) return "Unknown";
-
-      const upper = raw.toUpperCase();
-      if (upper.includes("MIDLAND")) return "Midland";
-      if (upper.includes("ODESSA")) return "Odessa";
-
       return raw;
     }
     function getSalesInRange(startDate, endDate) {
@@ -795,7 +817,6 @@ const verses = [
             tickets: 0
           };
         }
-
         byFacility[record.facility].totalBbl += record.bblTotal;
         byFacility[record.facility].tickets += 1;
         totalBbl += record.bblTotal;
@@ -807,6 +828,117 @@ const verses = [
         totalTickets,
         facilityList: Object.values(byFacility).sort((a, b) => b.totalBbl - a.totalBbl)
       };
+    }
+
+    function getLastNDaysDailyTotals(dayCount) {
+      const today = atStartOfDay(new Date());
+      const start = new Date(today);
+      start.setDate(today.getDate() - (dayCount - 1));
+
+      const dailyMap = {};
+      for (let i = 0; i < dayCount; i++) {
+        const d = new Date(start);
+        d.setDate(start.getDate() + i);
+        dailyMap[toInputDateValue(d)] = {
+          date: d,
+          total: 0
+        };
+      }
+
+      oilSalesRecords.forEach(record => {
+        const key = toInputDateValue(record.saleDate);
+        if (dailyMap[key]) {
+          dailyMap[key].total += record.bblTotal;
+        }
+      });
+
+      return Object.values(dailyMap);
+    }
+
+    function drawOilSalesChart() {
+      const canvas = document.getElementById("oilSalesChart");
+      if (!canvas) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const width = Math.max(600, Math.floor(rect.width || 600));
+      const height = 280;
+
+      canvas.width = width;
+      canvas.height = height;
+
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, width, height);
+
+      const data = getLastNDaysDailyTotals(14);
+      const values = data.map(x => x.total);
+      const maxValue = Math.max(...values, 1);
+
+      const padLeft = 50;
+      const padRight = 20;
+      const padTop = 20;
+      const padBottom = 40;
+      const chartWidth = width - padLeft - padRight;
+      const chartHeight = height - padTop - padBottom;
+
+      ctx.strokeStyle = "rgba(255,255,255,0.12)";
+      ctx.lineWidth = 1;
+
+      for (let i = 0; i <= 4; i++) {
+        const y = padTop + (chartHeight / 4) * i;
+        ctx.beginPath();
+        ctx.moveTo(padLeft, y);
+        ctx.lineTo(width - padRight, y);
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = "rgba(203,213,225,0.9)";
+      ctx.font = "12px Arial";
+      ctx.textAlign = "right";
+
+      for (let i = 0; i <= 4; i++) {
+        const val = Math.round(maxValue - (maxValue / 4) * i);
+        const y = padTop + (chartHeight / 4) * i + 4;
+        ctx.fillText(val.toLocaleString(), padLeft - 8, y);
+      }
+
+      if (!data.length) return;
+
+      const points = data.map((item, index) => {
+        const x = padLeft + (chartWidth * index / Math.max(data.length - 1, 1));
+        const y = padTop + chartHeight - ((item.total / maxValue) * chartHeight);
+        return { x, y, label: item.date, total: item.total };
+      });
+
+      ctx.strokeStyle = "rgba(96,165,250,0.95)";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      points.forEach((pt, i) => {
+        if (i === 0) ctx.moveTo(pt.x, pt.y);
+        else ctx.lineTo(pt.x, pt.y);
+      });
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(167,139,250,0.95)";
+      points.forEach(pt => {
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      ctx.fillStyle = "rgba(203,213,225,0.95)";
+      ctx.textAlign = "center";
+      const labelIndexes = [0, 3, 6, 9, 13].filter(i => i < points.length);
+
+      labelIndexes.forEach(i => {
+        const pt = points[i];
+        const label = `${pt.label.getMonth() + 1}/${pt.label.getDate()}`;
+        ctx.fillText(label, pt.x, height - 14);
+      });
+
+      const startLabel = data[0] ? fmtDate(data[0].date) : "";
+      const endLabel = data[data.length - 1] ? fmtDate(data[data.length - 1].date) : "";
+      document.getElementById("oilSalesChartSub").textContent =
+        `Combined daily BBL sold from ${startLabel} through ${endLabel}`;
     }
 
     function renderWeeklySalesCards() {
@@ -984,6 +1116,7 @@ const verses = [
     document.getElementById("dashboardTab").addEventListener("click", () => showView("dashboard"));
     document.getElementById("salesTab").addEventListener("click", () => showView("sales"));
     document.getElementById("runLookupBtn").addEventListener("click", runDateRangeLookup);
+    window.addEventListener("resize", drawOilSalesChart);
 
     fetch(capacityURL)
       .then(res => res.text())
@@ -1080,12 +1213,19 @@ const verses = [
 
         for (let i = 1; i < rows.length; i++) {
           const row = rows[i];
-          const saleDate = parseSheetDate(getCellValue(row, 2));
+
+          const saleDate = parseSheetDate(row);
           const ticket = getCellDisplayValue(row, 4);
           const pickupLease = getCellDisplayValue(row, 5);
-          const bblTotal = cleanNumber(getCellValue(row, 10));
 
-          if (!saleDate || !ticket || !pickupLease || bblTotal <= 0) continue;
+          let bblTotal = cleanNumber(getCellValue(row, 10));
+          if (!bblTotal) {
+            bblTotal = cleanNumber(getCellDisplayValue(row, 10));
+          }
+
+          if (!saleDate || !ticket || !pickupLease || bblTotal <= 0) {
+            continue;
+          }
 
           records.push({
             saleDate,
@@ -1099,6 +1239,7 @@ const verses = [
 
         oilSalesRecords = records;
         renderWeeklySalesCards();
+        drawOilSalesChart();
         setDefaultLookupDates();
         runDateRangeLookup();
       })
