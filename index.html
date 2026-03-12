@@ -1211,31 +1211,78 @@ const verses = [
     const rows = parseGoogleSheet(text);
     const records = [];
 
-    console.log("OilSales_Data rows loaded:", rows.length);
+    console.log("OilSales rows loaded:", rows.length);
 
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
 
-      const saleDate = parseSheetDate(row);
-      const ticket = getCellDisplayValue(row, 4);       // Column E
-      const pickupLease = getCellDisplayValue(row, 5);  // Column F
+      let saleDate = null;
 
-      let bblTotal = cleanNumber(getCellValue(row, 10)); // Column K raw
+      // 1) Try Column C display value first
+      const displayDateC = getCellDisplayValue(row, 2);
+      if (displayDateC) {
+        const d = new Date(displayDateC);
+        if (!isNaN(d.getTime())) {
+          saleDate = atStartOfDay(d);
+        }
+      }
+
+      // 2) Try Column C raw value next
+      if (!saleDate) {
+        const rawDateC = getCellValue(row, 2);
+        if (rawDateC instanceof Date && !isNaN(rawDateC.getTime())) {
+          saleDate = atStartOfDay(rawDateC);
+        } else if (rawDateC !== null && rawDateC !== undefined && rawDateC !== "") {
+          const d = new Date(String(rawDateC));
+          if (!isNaN(d.getTime())) {
+            saleDate = atStartOfDay(d);
+          }
+        }
+      }
+
+      // 3) Fallback to Column A timestamp display
+      if (!saleDate) {
+        const displayDateA = getCellDisplayValue(row, 0);
+        if (displayDateA) {
+          const d = new Date(displayDateA);
+          if (!isNaN(d.getTime())) {
+            saleDate = atStartOfDay(d);
+          }
+        }
+      }
+
+      // 4) Fallback to Column A raw timestamp
+      if (!saleDate) {
+        const rawDateA = getCellValue(row, 0);
+        if (rawDateA instanceof Date && !isNaN(rawDateA.getTime())) {
+          saleDate = atStartOfDay(rawDateA);
+        } else if (rawDateA !== null && rawDateA !== undefined && rawDateA !== "") {
+          const d = new Date(String(rawDateA));
+          if (!isNaN(d.getTime())) {
+            saleDate = atStartOfDay(d);
+          }
+        }
+      }
+
+      const ticket = getCellDisplayValue(row, 4);       // E
+      const pickupLease = getCellDisplayValue(row, 5);  // F
+
+      let bblTotal = cleanNumber(getCellValue(row, 10)); // K raw
       if (!bblTotal) {
-        bblTotal = cleanNumber(getCellDisplayValue(row, 10)); // fallback
+        bblTotal = cleanNumber(getCellDisplayValue(row, 10)); // K display fallback
       }
 
-      // Only require the fields actually needed to count oil
-      if (!saleDate || !pickupLease || bblTotal <= 0) {
-        continue;
-      }
+      // Only require date + positive BBL
+      if (!saleDate || bblTotal <= 0) continue;
+
+      const facilityName = String(pickupLease || "Unknown").trim();
 
       records.push({
         saleDate,
         saleDateText: fmtDate(saleDate),
         ticket: String(ticket || "").trim(),
-        pickupLease: String(pickupLease).trim(),
-        facility: normalizeFacilityName(pickupLease),
+        pickupLease: facilityName,
+        facility: facilityName,
         bblTotal
       });
     }
@@ -1243,16 +1290,11 @@ const verses = [
     oilSalesRecords = records;
 
     console.log("Valid oil sales records:", oilSalesRecords.length);
-    console.log("Sample records:", oilSalesRecords.slice(0, 10));
+    console.log("All oil sales records:", oilSalesRecords);
 
-    // Update dashboard
     renderWeeklySalesCards();
     drawOilSalesChart();
-
-    // Set lookup default dates
     setDefaultLookupDates();
-
-    // Run lookup if tab is used
     runDateRangeLookup();
   })
   .catch(err => {
@@ -1272,7 +1314,6 @@ const verses = [
     document.getElementById("lastUpdated").textContent =
       `Last updated: ${new Date().toLocaleString()}`;
   });
-
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js");
