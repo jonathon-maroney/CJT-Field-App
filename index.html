@@ -1211,78 +1211,31 @@ const verses = [
     const rows = parseGoogleSheet(text);
     const records = [];
 
-    console.log("OilSales rows loaded:", rows.length);
+    console.log("OilSales_Data rows loaded:", rows.length);
 
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
 
-      let saleDate = null;
+      const saleDate = parseSheetDate(row);
+      const ticket = getCellDisplayValue(row, 4);       // Column E
+      const pickupLease = getCellDisplayValue(row, 5);  // Column F
 
-      // 1) Try Column C display value first
-      const displayDateC = getCellDisplayValue(row, 2);
-      if (displayDateC) {
-        const d = new Date(displayDateC);
-        if (!isNaN(d.getTime())) {
-          saleDate = atStartOfDay(d);
-        }
-      }
-
-      // 2) Try Column C raw value next
-      if (!saleDate) {
-        const rawDateC = getCellValue(row, 2);
-        if (rawDateC instanceof Date && !isNaN(rawDateC.getTime())) {
-          saleDate = atStartOfDay(rawDateC);
-        } else if (rawDateC !== null && rawDateC !== undefined && rawDateC !== "") {
-          const d = new Date(String(rawDateC));
-          if (!isNaN(d.getTime())) {
-            saleDate = atStartOfDay(d);
-          }
-        }
-      }
-
-      // 3) Fallback to Column A timestamp display
-      if (!saleDate) {
-        const displayDateA = getCellDisplayValue(row, 0);
-        if (displayDateA) {
-          const d = new Date(displayDateA);
-          if (!isNaN(d.getTime())) {
-            saleDate = atStartOfDay(d);
-          }
-        }
-      }
-
-      // 4) Fallback to Column A raw timestamp
-      if (!saleDate) {
-        const rawDateA = getCellValue(row, 0);
-        if (rawDateA instanceof Date && !isNaN(rawDateA.getTime())) {
-          saleDate = atStartOfDay(rawDateA);
-        } else if (rawDateA !== null && rawDateA !== undefined && rawDateA !== "") {
-          const d = new Date(String(rawDateA));
-          if (!isNaN(d.getTime())) {
-            saleDate = atStartOfDay(d);
-          }
-        }
-      }
-
-      const ticket = getCellDisplayValue(row, 4);       // E
-      const pickupLease = getCellDisplayValue(row, 5);  // F
-
-      let bblTotal = cleanNumber(getCellValue(row, 10)); // K raw
+      let bblTotal = cleanNumber(getCellValue(row, 10)); // Column K raw
       if (!bblTotal) {
-        bblTotal = cleanNumber(getCellDisplayValue(row, 10)); // K display fallback
+        bblTotal = cleanNumber(getCellDisplayValue(row, 10)); // fallback
       }
 
-      // Only require date + positive BBL
-      if (!saleDate || bblTotal <= 0) continue;
-
-      const facilityName = String(pickupLease || "Unknown").trim();
+      // Only require the fields actually needed to count oil
+      if (!saleDate || !pickupLease || bblTotal <= 0) {
+        continue;
+      }
 
       records.push({
         saleDate,
         saleDateText: fmtDate(saleDate),
         ticket: String(ticket || "").trim(),
-        pickupLease: facilityName,
-        facility: facilityName,
+        pickupLease: String(pickupLease).trim(),
+        facility: normalizeFacilityName(pickupLease),
         bblTotal
       });
     }
@@ -1290,11 +1243,16 @@ const verses = [
     oilSalesRecords = records;
 
     console.log("Valid oil sales records:", oilSalesRecords.length);
-    console.log("All oil sales records:", oilSalesRecords);
+    console.log("Sample records:", oilSalesRecords.slice(0, 10));
 
+    // Update dashboard
     renderWeeklySalesCards();
     drawOilSalesChart();
+
+    // Set lookup default dates
     setDefaultLookupDates();
+
+    // Run lookup if tab is used
     runDateRangeLookup();
   })
   .catch(err => {
@@ -1315,79 +1273,240 @@ const verses = [
       `Last updated: ${new Date().toLocaleString()}`;
   });
 
+
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js");
 }
   </script>
   <!-- ================= CRUDE COMMANDER ================= -->
-<div id="chatToggleBtn" style="position:fixed;bottom:20px;right:20px;background:#111;color:#fff;padding:14px 18px;border-radius:50px;cursor:pointer;z-index:9999;font-weight:bold;">
+<div id="chatToggleBtn" style="
+position:fixed;
+bottom:16px;
+right:16px;
+background:#111;
+color:#fff;
+width:56px;
+height:56px;
+border-radius:999px;
+cursor:pointer;
+z-index:9999;
+font-weight:bold;
+display:flex;
+align-items:center;
+justify-content:center;
+box-shadow:0 8px 20px rgba(0,0,0,0.28);
+font-size:22px;
+">
 💬
 </div>
 
-<div id="chatWindow" style="position:fixed;bottom:80px;right:20px;width:320px;height:420px;background:#fff;border-radius:12px;display:none;flex-direction:column;z-index:9999;overflow:hidden;">
+<div id="chatWindow" style="
+position:fixed;
+left:12px;
+right:12px;
+bottom:84px;
+height:58vh;
+max-height:460px;
+background:#ffffff;
+border-radius:16px;
+display:none;
+flex-direction:column;
+z-index:9999;
+overflow:hidden;
+box-shadow:0 10px 30px rgba(0,0,0,0.30);
+border:1px solid #d1d5db;
+">
 
-  <div style="background:#111;color:#fff;padding:10px;font-weight:bold;">
-    Crude Commander
+  <div style="
+  background:#111;
+  color:#fff;
+  padding:12px 14px;
+  font-weight:800;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  ">
+    <span>Crude Commander</span>
+    <button id="chatCloseBtn" type="button" style="
+    background:transparent;
+    color:#fff;
+    border:none;
+    font-size:20px;
+    cursor:pointer;
+    ">×</button>
   </div>
 
-  <div id="chatMessages" style="flex:1;overflow-y:auto;padding:10px;background:#f5f5f5;white-space:pre-wrap;"></div>
+  <div id="chatMessages" style="
+  flex:1;
+  overflow-y:auto;
+  padding:12px;
+  background:#f3f4f6;
+  white-space:pre-wrap;
+  font-size:14px;
+  line-height:1.4;
+  "></div>
 
-  <input id="chatOperator" placeholder="Operator" style="padding:6px;border:none;border-top:1px solid #ddd;">
+  <div style="
+  background:#fff;
+  border-top:1px solid #e5e7eb;
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  ">
+    <input id="chatOperator" placeholder="Operator name" style="
+    width:100%;
+    padding:10px 12px;
+    border:1px solid #d1d5db;
+    border-radius:10px;
+    font-size:14px;
+    ">
 
-  <textarea id="chatInput" style="height:60px;border:none;padding:8px;border-top:1px solid #ddd;"></textarea>
+    <textarea id="chatInput" placeholder="Tell me what's going on..." style="
+    width:100%;
+    min-height:72px;
+    max-height:120px;
+    padding:10px 12px;
+    border:1px solid #d1d5db;
+    border-radius:10px;
+    resize:none;
+    font-size:14px;
+    "></textarea>
 
-  <button id="sendChatBtn" style="background:#111;color:#fff;border:none;padding:8px;">Send</button>
+    <button id="sendChatBtn" type="button" style="
+    background:#111;
+    color:#fff;
+    border:none;
+    padding:12px;
+    border-radius:10px;
+    font-weight:700;
+    cursor:pointer;
+    ">Send</button>
+  </div>
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbzdD3vHfwiA-MKHi8aW9-LiUhQZpr_g8BQpeoUrOJLJg-1PFwt6TuBqzQdGo20AzQnS/exec";
+(function () {
+  const API_URL = "https://script.google.com/macros/s/AKfycbzdD3vHfwiA-MKHi8aW9-LiUhQZpr_g8BQpeoUrOJLJg-1PFwt6TuBqzQdGo20AzQnS/exec";
 
-const btn = document.getElementById("chatToggleBtn");
-const win = document.getElementById("chatWindow");
-const msgs = document.getElementById("chatMessages");
-
-btn.onclick = () => {
-  win.style.display = win.style.display === "none" ? "flex" : "none";
-};
-
-function addMsg(role, text){
-  const d = document.createElement("div");
-  d.style.marginBottom="8px";
-  d.style.padding="6px";
-  d.style.borderRadius="6px";
-  d.style.whiteSpace="pre-wrap";
-
-  if(role==="user"){
-    d.style.background="#111";
-    d.style.color="#fff";
-  } else {
-    d.style.background="#e9eefc";
+  let sessionId = localStorage.getItem("chatSessionId");
+  if (!sessionId) {
+    sessionId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now());
+    localStorage.setItem("chatSessionId", sessionId);
   }
 
-  d.innerText=text;
-  msgs.appendChild(d);
-  msgs.scrollTop = msgs.scrollHeight;
-}
+  const chatBtn = document.getElementById("chatToggleBtn");
+  const chatWindow = document.getElementById("chatWindow");
+  const chatCloseBtn = document.getElementById("chatCloseBtn");
+  const chatMessages = document.getElementById("chatMessages");
+  const chatInput = document.getElementById("chatInput");
+  const chatOperator = document.getElementById("chatOperator");
+  const sendChatBtn = document.getElementById("sendChatBtn");
 
-document.getElementById("sendChatBtn").onclick = async () => {
-  const message = document.getElementById("chatInput").value;
-  const operator = document.getElementById("chatOperator").value || "Unknown";
+  const savedOperator = localStorage.getItem("chatOperatorName");
+  if (savedOperator) chatOperator.value = savedOperator;
 
-  if(!message) return;
+  function addMsg(role, text) {
+    const row = document.createElement("div");
+    row.style.display = "flex";
+    row.style.marginBottom = "10px";
+    row.style.justifyContent = role === "user" ? "flex-end" : "flex-start";
 
-  addMsg("user", message);
-  document.getElementById("chatInput").value="";
+    const bubble = document.createElement("div");
+    bubble.style.maxWidth = "85%";
+    bubble.style.padding = "10px 12px";
+    bubble.style.borderRadius = "12px";
+    bubble.style.whiteSpace = "pre-wrap";
+    bubble.style.wordBreak = "break-word";
 
-  const res = await fetch(API_URL,{
-    method:"POST",
-    headers:{ "Content-Type":"application/json"},
-    body: JSON.stringify({message, operator})
+    if (role === "user") {
+      bubble.style.background = "#111";
+      bubble.style.color = "#fff";
+    } else {
+      bubble.style.background = "#dbeafe";
+      bubble.style.color = "#111";
+    }
+
+    bubble.textContent = text;
+    row.appendChild(bubble);
+    chatMessages.appendChild(row);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function setSending(isSending) {
+    sendChatBtn.disabled = isSending;
+    sendChatBtn.style.opacity = isSending ? "0.6" : "1";
+    sendChatBtn.textContent = isSending ? "Sending..." : "Send";
+  }
+
+  async function sendMessage() {
+    const message = chatInput.value.trim();
+    const operator = chatOperator.value.trim() || "Unknown";
+
+    if (!message) return;
+
+    localStorage.setItem("chatOperatorName", operator);
+
+    addMsg("user", message);
+    chatInput.value = "";
+    setSending(true);
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: JSON.stringify({
+          sessionId: sessionId,
+          message: message,
+          operator: operator
+        })
+      });
+
+      const text = await res.text();
+      let data = {};
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        throw new Error("Invalid response: " + text);
+      }
+
+      if (data && data.response) {
+        addMsg("bot", data.response);
+      } else {
+        addMsg("bot", "The system answered, but no message came through.");
+      }
+    } catch (err) {
+      console.error("Chat send failed:", err);
+      addMsg("bot", "Message did not send cleanly. Check the web app deployment and try again.");
+    } finally {
+      setSending(false);
+    }
+  }
+
+  chatBtn.onclick = function () {
+    chatWindow.style.display = "flex";
+  };
+
+  chatCloseBtn.onclick = function () {
+    chatWindow.style.display = "none";
+  };
+
+  sendChatBtn.onclick = sendMessage;
+
+  chatInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
   });
 
-  const data = await res.json();
-
-  addMsg("bot", data.response);
-};
+  if (!window.__crudeCommanderLoaded) {
+    addMsg("bot", "Crude Commander is online. Tell me what the machine is doing.");
+    window.__crudeCommanderLoaded = true;
+  }
+})();
 </script>
 <!-- ================= END CHAT ================= -->
 </body>
