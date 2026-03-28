@@ -1211,31 +1211,78 @@ const verses = [
     const rows = parseGoogleSheet(text);
     const records = [];
 
-    console.log("OilSales_Data rows loaded:", rows.length);
+    console.log("OilSales rows loaded:", rows.length);
 
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
 
-      const saleDate = parseSheetDate(row);
-      const ticket = getCellDisplayValue(row, 4);       // Column E
-      const pickupLease = getCellDisplayValue(row, 5);  // Column F
+      let saleDate = null;
 
-      let bblTotal = cleanNumber(getCellValue(row, 10)); // Column K raw
+      // 1) Try Column C display value first
+      const displayDateC = getCellDisplayValue(row, 2);
+      if (displayDateC) {
+        const d = new Date(displayDateC);
+        if (!isNaN(d.getTime())) {
+          saleDate = atStartOfDay(d);
+        }
+      }
+
+      // 2) Try Column C raw value next
+      if (!saleDate) {
+        const rawDateC = getCellValue(row, 2);
+        if (rawDateC instanceof Date && !isNaN(rawDateC.getTime())) {
+          saleDate = atStartOfDay(rawDateC);
+        } else if (rawDateC !== null && rawDateC !== undefined && rawDateC !== "") {
+          const d = new Date(String(rawDateC));
+          if (!isNaN(d.getTime())) {
+            saleDate = atStartOfDay(d);
+          }
+        }
+      }
+
+      // 3) Fallback to Column A timestamp display
+      if (!saleDate) {
+        const displayDateA = getCellDisplayValue(row, 0);
+        if (displayDateA) {
+          const d = new Date(displayDateA);
+          if (!isNaN(d.getTime())) {
+            saleDate = atStartOfDay(d);
+          }
+        }
+      }
+
+      // 4) Fallback to Column A raw timestamp
+      if (!saleDate) {
+        const rawDateA = getCellValue(row, 0);
+        if (rawDateA instanceof Date && !isNaN(rawDateA.getTime())) {
+          saleDate = atStartOfDay(rawDateA);
+        } else if (rawDateA !== null && rawDateA !== undefined && rawDateA !== "") {
+          const d = new Date(String(rawDateA));
+          if (!isNaN(d.getTime())) {
+            saleDate = atStartOfDay(d);
+          }
+        }
+      }
+
+      const ticket = getCellDisplayValue(row, 4);       // E
+      const pickupLease = getCellDisplayValue(row, 5);  // F
+
+      let bblTotal = cleanNumber(getCellValue(row, 10)); // K raw
       if (!bblTotal) {
-        bblTotal = cleanNumber(getCellDisplayValue(row, 10)); // fallback
+        bblTotal = cleanNumber(getCellDisplayValue(row, 10)); // K display fallback
       }
 
-      // Only require the fields actually needed to count oil
-      if (!saleDate || !pickupLease || bblTotal <= 0) {
-        continue;
-      }
+      // Only require date + positive BBL
+      if (!saleDate || bblTotal <= 0) continue;
+
+      const facilityName = String(pickupLease || "Unknown").trim();
 
       records.push({
         saleDate,
         saleDateText: fmtDate(saleDate),
         ticket: String(ticket || "").trim(),
-        pickupLease: String(pickupLease).trim(),
-        facility: normalizeFacilityName(pickupLease),
+        pickupLease: facilityName,
+        facility: facilityName,
         bblTotal
       });
     }
@@ -1243,16 +1290,11 @@ const verses = [
     oilSalesRecords = records;
 
     console.log("Valid oil sales records:", oilSalesRecords.length);
-    console.log("Sample records:", oilSalesRecords.slice(0, 10));
+    console.log("All oil sales records:", oilSalesRecords);
 
-    // Update dashboard
     renderWeeklySalesCards();
     drawOilSalesChart();
-
-    // Set lookup default dates
     setDefaultLookupDates();
-
-    // Run lookup if tab is used
     runDateRangeLookup();
   })
   .catch(err => {
@@ -1272,7 +1314,6 @@ const verses = [
     document.getElementById("lastUpdated").textContent =
       `Last updated: ${new Date().toLocaleString()}`;
   });
-
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js");
@@ -1305,8 +1346,8 @@ position:fixed;
 left:12px;
 right:12px;
 bottom:84px;
-height:58vh;
-max-height:460px;
+height:62vh;
+max-height:520px;
 background:#ffffff;
 border-radius:16px;
 display:none;
@@ -1362,6 +1403,20 @@ border:1px solid #d1d5db;
     font-size:14px;
     ">
 
+    <select id="chatUnitSelect" style="
+    width:100%;
+    padding:10px 12px;
+    border:1px solid #d1d5db;
+    border-radius:10px;
+    font-size:14px;
+    background:#fff;
+    color:#111;
+    ">
+      <option value="">Select unit / location</option>
+      <option value="Midland|Byrd">Midland / Byrd</option>
+      <option value="Odessa|Z6 Flottweg">Odessa / Flottweg Z6</option>
+    </select>
+
     <textarea id="chatInput" placeholder="Tell me what's going on..." style="
     width:100%;
     min-height:72px;
@@ -1401,10 +1456,14 @@ border:1px solid #d1d5db;
   const chatMessages = document.getElementById("chatMessages");
   const chatInput = document.getElementById("chatInput");
   const chatOperator = document.getElementById("chatOperator");
+  const chatUnitSelect = document.getElementById("chatUnitSelect");
   const sendChatBtn = document.getElementById("sendChatBtn");
 
   const savedOperator = localStorage.getItem("chatOperatorName");
   if (savedOperator) chatOperator.value = savedOperator;
+
+  const savedUnit = localStorage.getItem("chatUnitValue");
+  if (savedUnit) chatUnitSelect.value = savedUnit;
 
   function addMsg(role, text) {
     const row = document.createElement("div");
@@ -1442,12 +1501,25 @@ border:1px solid #d1d5db;
   async function sendMessage() {
     const message = chatInput.value.trim();
     const operator = chatOperator.value.trim() || "Unknown";
+    const unitValue = chatUnitSelect.value;
+
+    if (!unitValue) {
+      addMsg("bot", "First pick which unit you're talking about: Midland / Byrd or Odessa / Flottweg Z6.");
+      return;
+    }
 
     if (!message) return;
 
     localStorage.setItem("chatOperatorName", operator);
+    localStorage.setItem("chatUnitValue", unitValue);
 
-    addMsg("user", message);
+    const parts = unitValue.split("|");
+    const site = parts[0] || "";
+    const unit = parts[1] || "";
+
+    const machineContextMessage = "Site: " + site + ". Unit: " + unit + ". " + message;
+
+    addMsg("user", "[" + site + " / " + unit + "] " + message);
     chatInput.value = "";
     setSending(true);
 
@@ -1459,8 +1531,10 @@ border:1px solid #d1d5db;
         },
         body: JSON.stringify({
           sessionId: sessionId,
-          message: message,
-          operator: operator
+          operator: operator,
+          message: machineContextMessage,
+          site: site,
+          unit: unit
         })
       });
 
@@ -1503,7 +1577,7 @@ border:1px solid #d1d5db;
   });
 
   if (!window.__crudeCommanderLoaded) {
-    addMsg("bot", "Crude Commander is online. Tell me what the machine is doing.");
+    addMsg("bot", "Crude Commander is online. Pick Midland / Byrd or Odessa / Flottweg Z6, then tell me what the machine is doing.");
     window.__crudeCommanderLoaded = true;
   }
 })();
