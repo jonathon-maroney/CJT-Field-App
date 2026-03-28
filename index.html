@@ -1347,7 +1347,7 @@ left:12px;
 right:12px;
 bottom:84px;
 height:62vh;
-max-height:520px;
+max-height:540px;
 background:#ffffff;
 border-radius:16px;
 display:none;
@@ -1417,6 +1417,19 @@ border:1px solid #d1d5db;
       <option value="Odessa|Z6 Flottweg">Odessa / Flottweg Z6</option>
     </select>
 
+    <select id="chatModeSelect" style="
+    width:100%;
+    padding:10px 12px;
+    border:1px solid #d1d5db;
+    border-radius:10px;
+    font-size:14px;
+    background:#fff;
+    color:#111;
+    ">
+      <option value="live">Live Machine</option>
+      <option value="hypothetical">Hypothetical</option>
+    </select>
+
     <textarea id="chatInput" placeholder="Tell me what's going on..." style="
     width:100%;
     min-height:72px;
@@ -1444,10 +1457,27 @@ border:1px solid #d1d5db;
 (function () {
   const API_URL = "https://script.google.com/macros/s/AKfycbzdD3vHfwiA-MKHi8aW9-LiUhQZpr_g8BQpeoUrOJLJg-1PFwt6TuBqzQdGo20AzQnS/exec";
 
-  let sessionId = localStorage.getItem("chatSessionId");
+  const SESSION_KEY = "crudeCommanderSessionId";
+  const OPERATOR_KEY = "crudeCommanderOperator";
+  const UNIT_KEY = "crudeCommanderUnit";
+  const MODE_KEY = "crudeCommanderMode";
+
+  const encouragements = [
+    "Stay steady. One clean move at a time.",
+    "Keep it simple and read the machine.",
+    "Good operators don’t guess. They verify.",
+    "Stay sharp. Control the process, don’t chase it.",
+    "One adjustment, then read the result."
+  ];
+
+  function newSessionId() {
+    return (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now() + Math.random());
+  }
+
+  let sessionId = localStorage.getItem(SESSION_KEY);
   if (!sessionId) {
-    sessionId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now());
-    localStorage.setItem("chatSessionId", sessionId);
+    sessionId = newSessionId();
+    localStorage.setItem(SESSION_KEY, sessionId);
   }
 
   const chatBtn = document.getElementById("chatToggleBtn");
@@ -1457,13 +1487,17 @@ border:1px solid #d1d5db;
   const chatInput = document.getElementById("chatInput");
   const chatOperator = document.getElementById("chatOperator");
   const chatUnitSelect = document.getElementById("chatUnitSelect");
+  const chatModeSelect = document.getElementById("chatModeSelect");
   const sendChatBtn = document.getElementById("sendChatBtn");
 
-  const savedOperator = localStorage.getItem("chatOperatorName");
+  const savedOperator = localStorage.getItem(OPERATOR_KEY);
   if (savedOperator) chatOperator.value = savedOperator;
 
-  const savedUnit = localStorage.getItem("chatUnitValue");
+  const savedUnit = localStorage.getItem(UNIT_KEY);
   if (savedUnit) chatUnitSelect.value = savedUnit;
+
+  const savedMode = localStorage.getItem(MODE_KEY);
+  if (savedMode) chatModeSelect.value = savedMode;
 
   function addMsg(role, text) {
     const row = document.createElement("div");
@@ -1498,28 +1532,113 @@ border:1px solid #d1d5db;
     sendChatBtn.textContent = isSending ? "Sending..." : "Send";
   }
 
+  function getContext() {
+    const unitValue = chatUnitSelect.value;
+    if (!unitValue) return null;
+
+    const parts = unitValue.split("|");
+    return {
+      site: parts[0] || "",
+      unit: parts[1] || ""
+    };
+  }
+
+  function resetSession(reasonText) {
+    sessionId = newSessionId();
+    localStorage.setItem(SESSION_KEY, sessionId);
+    chatMessages.innerHTML = "";
+    if (reasonText) addMsg("bot", reasonText);
+  }
+
+  function maybeResetSessionForChanges() {
+    const currentUnitValue = chatUnitSelect.value;
+    const savedUnitValue = localStorage.getItem(UNIT_KEY) || "";
+    const currentModeValue = chatModeSelect.value;
+    const savedModeValue = localStorage.getItem(MODE_KEY) || "";
+
+    if (currentUnitValue && currentUnitValue !== savedUnitValue) {
+      localStorage.setItem(UNIT_KEY, currentUnitValue);
+      localStorage.setItem(MODE_KEY, currentModeValue);
+      resetSession("Locked to " + currentUnitValue.replace("|", " / ") + ". New session started for this machine.");
+      return;
+    }
+
+    if (currentModeValue !== savedModeValue) {
+      localStorage.setItem(MODE_KEY, currentModeValue);
+      if (currentUnitValue) localStorage.setItem(UNIT_KEY, currentUnitValue);
+
+      if (currentModeValue === "hypothetical") {
+        resetSession("Hypothetical mode is on. I’ll treat this as a training scenario, not a live case.");
+      } else {
+        resetSession("Live Machine mode is on. I’ll treat this as a real machine case and watch real follow-up entries.");
+      }
+    }
+  }
+
+  function addEncouragement(text) {
+    const lower = String(text || "").toLowerCase();
+
+    if (
+      lower.includes("you’re running cold") ||
+      lower.includes("you're running cold") ||
+      lower.includes("solids discharge problem") ||
+      lower.includes("shut it down immediately") ||
+      lower.includes("i found a similar run") ||
+      lower.includes("i checked the next entries") ||
+      lower.includes("this looks like") ||
+      lower.includes("best move here")
+    ) {
+      const pick = encouragements[Math.floor(Math.random() * encouragements.length)];
+      return text + "\n\n" + pick;
+    }
+
+    return text;
+  }
+
   async function sendMessage() {
     const message = chatInput.value.trim();
     const operator = chatOperator.value.trim() || "Unknown";
-    const unitValue = chatUnitSelect.value;
+    const context = getContext();
+    const mode = chatModeSelect.value || "live";
 
-    if (!unitValue) {
+    if (!context) {
       addMsg("bot", "First pick which unit you're talking about: Midland / Byrd or Odessa / Flottweg Z6.");
       return;
     }
 
     if (!message) return;
 
-    localStorage.setItem("chatOperatorName", operator);
-    localStorage.setItem("chatUnitValue", unitValue);
+    maybeResetSessionForChanges();
+    localStorage.setItem(OPERATOR_KEY, operator);
+    localStorage.setItem(UNIT_KEY, chatUnitSelect.value);
+    localStorage.setItem(MODE_KEY, mode);
 
-    const parts = unitValue.split("|");
-    const site = parts[0] || "";
-    const unit = parts[1] || "";
+    let machineContextMessage = "";
 
-    const machineContextMessage = "Site: " + site + ". Unit: " + unit + ". " + message;
+    if (mode === "hypothetical") {
+      machineContextMessage =
+        "Mode: Hypothetical. " +
+        "Site: " + context.site + ". " +
+        "Unit: " + context.unit + ". " +
+        "Treat this as a training scenario only. " +
+        "Do not claim you checked the next live entries for this unit. " +
+        "Do not treat this as a real active troubleshooting run. " +
+        "Use machine-specific logic and historical knowledge as guidance only. " +
+        message;
+    } else {
+      machineContextMessage =
+        "Mode: Live Machine. " +
+        "Site: " + context.site + ". " +
+        "Unit: " + context.unit + ". " +
+        "Use only this machine context for lookup and outcome tracking. " +
+        message;
+    }
 
-    addMsg("user", "[" + site + " / " + unit + "] " + message);
+    addMsg(
+      "user",
+      "[" + context.site + " / " + context.unit + " | " + (mode === "hypothetical" ? "Hypothetical" : "Live") + "] " + message
+    );
+
     chatInput.value = "";
     setSending(true);
 
@@ -1532,9 +1651,10 @@ border:1px solid #d1d5db;
         body: JSON.stringify({
           sessionId: sessionId,
           operator: operator,
-          message: machineContextMessage,
-          site: site,
-          unit: unit
+          site: context.site,
+          unit: context.unit,
+          mode: mode,
+          message: machineContextMessage
         })
       });
 
@@ -1547,7 +1667,7 @@ border:1px solid #d1d5db;
       }
 
       if (data && data.response) {
-        addMsg("bot", data.response);
+        addMsg("bot", addEncouragement(data.response));
       } else {
         addMsg("bot", "The system answered, but no message came through.");
       }
@@ -1567,6 +1687,14 @@ border:1px solid #d1d5db;
     chatWindow.style.display = "none";
   };
 
+  chatUnitSelect.addEventListener("change", function () {
+    maybeResetSessionForChanges();
+  });
+
+  chatModeSelect.addEventListener("change", function () {
+    maybeResetSessionForChanges();
+  });
+
   sendChatBtn.onclick = sendMessage;
 
   chatInput.addEventListener("keydown", function (e) {
@@ -1577,7 +1705,7 @@ border:1px solid #d1d5db;
   });
 
   if (!window.__crudeCommanderLoaded) {
-    addMsg("bot", "Crude Commander is online. Pick Midland / Byrd or Odessa / Flottweg Z6, then tell me what the machine is doing.");
+    addMsg("bot", "Crude Commander is online. Pick a unit, choose Live Machine or Hypothetical, then tell me what the machine is doing.");
     window.__crudeCommanderLoaded = true;
   }
 })();
